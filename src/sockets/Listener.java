@@ -11,11 +11,10 @@ import java.net.Socket;
 import java.util.Iterator;
 
 import static data.dataInfo.PORT;
-import static data.dataInfo.identifiedRecord;
+import static data.dataInfo.verifyRecord1;
 import static tools.protocol.dealRecord;
 import static tools.protocol.dealRegistRecord;
 import static tools.toByte.intToByte;
-import static tools.toByte.intToOneByte;
 
 /**
  * Created by EnjoyD on 2017/5/2.
@@ -124,9 +123,9 @@ class handleThread implements Runnable {
     }
 
     private static void sendResult(OutputStream out) throws IOException {
-        synchronized (identifiedRecord){
-            out.write(intToByte(identifiedRecord.size()));
-            Iterator<Record> iterator=identifiedRecord.iterator();
+        synchronized (verifyRecord1){
+            out.write(intToByte(verifyRecord1.size()));
+            Iterator<Record> iterator= verifyRecord1.iterator();
             while (iterator.hasNext()){
                 Record record=iterator.next();
                 out.write(record.getLockScript());

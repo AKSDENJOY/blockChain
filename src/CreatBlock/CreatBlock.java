@@ -42,7 +42,7 @@ public class CreatBlock {
 //
 //
 //    private byte[] creatMerkle() {
-//        if (dataInfo.identifiedRecord.size()==0){//先进行此种测试
+//        if (dataInfo.verifyRecord1.size()==0){//先进行此种测试
 //            byte []Merkle=new byte[32];
 //            for (int i=0;i<Merkle.length;i++){
 //                Merkle[i]=0;

@@ -4,6 +4,7 @@ import broadcastBlock.BroadcastBlock;
 import data.Block;
 import firstBlock.creatFirstBlock;
 import sockets.Listener;
+import sockets.verifyThread;
 import writeBlock.WriteBlock;
 
 import java.io.FileNotFoundException;
@@ -36,7 +37,11 @@ public class Main2 {
      * @param args
      */
     public static void main(String[] args) {
+        //监听线程启动
         new Listener().start();
+        //验证线程启动
+        new verifyThread().start();
+
         try {
             creatFirstBlock.start();
         } catch (NoSuchAlgorithmException e) {

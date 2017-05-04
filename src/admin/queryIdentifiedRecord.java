@@ -7,11 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Iterator;
 
 import static data.dataInfo.PORT;
 import static data.dataInfo.ROOTIP;
-import static data.dataInfo.identifiedRecord;
 import static tools.toInt.byteToInt;
 import static tools.toString.byteToString;
 

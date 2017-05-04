@@ -3,6 +3,7 @@ package data;
 import java.nio.file.DirectoryStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.*;
 
 
 /**
@@ -11,7 +12,8 @@ import java.util.LinkedList;
 public class dataInfo {
     private dataInfo(){};
     public static LinkedList<Block> blocks= new LinkedList<>();
-    public static ArrayList<Record> identifiedRecord=new ArrayList<>();
+    public static LinkedBlockingQueue<Record> verifyRecord1 = new LinkedBlockingQueue<>();
+    public static ConcurrentHashMap<String,Record> verifyRecord2=new ConcurrentHashMap<>();
     public static ArrayList<Record> unidentifedRecord=new ArrayList<>();
 
     public static ArrayList<Integer> timeRecord=new ArrayList<>();
