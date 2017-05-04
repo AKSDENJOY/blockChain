@@ -7,6 +7,7 @@ import sun.security.util.ECUtil;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.ECPoint;
+import java.util.Arrays;
 
 import static data.dataInfo.ECNAME;
 import static data.dataInfo.verifyRecord1;
@@ -34,28 +35,37 @@ public class protocol {
         }
     }
     private static boolean verifyScriptRecord(Record record) {
+        //获得解锁脚本
         byte [] unLockScrpit=record.getUnLockScript();
+        //获得锁定脚本
         byte [] LockScript=record.getLockScript();
-        byte [] x=new byte[20];
-        byte [] y=new byte[20];
-        byte [] verifingSign=new byte[LockScript.length-40];
+        //验证公钥hash
+        byte [] tem=new byte[40];
+        System.arraycopy(unLockScrpit,0,tem,0,40);
+        byte [] temHash=SHA256.getInstance().sha256(tem);
+        if (!Arrays.equals(temHash,LockScript))
+            return false;
+        //验证签名
+        tem=new byte[14];
         byte [] mac=record.getMac();
         byte [] orderStamp=record.getOrderStamp();
         byte [] time=record.getTime();
-        System.arraycopy(mac,0,unLockScrpit,0,6);
-        System.arraycopy(orderStamp,0,unLockScrpit,6,4);
-        System.arraycopy(time,0,unLockScrpit,10,4);
-        byte []sha= SHA256.getInstance().sha256(unLockScrpit);
-
-        System.arraycopy(LockScript,0,x,0,20);
-        System.arraycopy(LockScript,20,y,0,20);
-        System.arraycopy(LockScript,40,verifingSign,0,verifingSign.length);
+        byte [] verifingSign=new byte[unLockScrpit.length-40];
+        byte [] x=new byte[20];
+        byte [] y=new byte[20];
+        System.arraycopy(unLockScrpit,0,x,0,20);
+        System.arraycopy(unLockScrpit,20,y,0,20);
+        System.arraycopy(unLockScrpit,40,verifingSign,0,verifingSign.length);
+        System.arraycopy(mac,0,tem,0,6);
+        System.arraycopy(orderStamp,0,tem,6,4);
+        System.arraycopy(time,0,tem,10,4);
+        temHash= SHA256.getInstance().sha256(tem);
         boolean result=false;
         try {
             ECPublicKeyImpl publicKey = new ECPublicKeyImpl(new ECPoint(new BigInteger(1, x), new BigInteger(1, y)), ECUtil.getECParameterSpec(null, ECNAME));
             Signature s = Signature.getInstance("SHA1withECDSA", "SunEC");
             s.initVerify(publicKey);
-            s.update(sha);
+            s.update(temHash);
             result= s.verify(verifingSign);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
