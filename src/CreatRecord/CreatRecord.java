@@ -197,7 +197,7 @@ public class CreatRecord {
         byte[] macAddress=getMacAddress();
         System.out.println(macAddress.length);
         //向全节点根据pubkey查找顺序戳
-        byte []orderStamp=getOrderStamp();
+        byte []orderStamp= new byte[4];
         System.out.println("4 "+orderStamp.length);
         //获取时间节点
         byte[]time=intToByte(getUnixTime());
