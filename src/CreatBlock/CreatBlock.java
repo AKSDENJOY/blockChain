@@ -2,14 +2,10 @@ package CreatBlock;
 
 import data.Block;
 import firstBlock.creatFirstBlock;
-import tools.SHA256;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import static data.dataInfo.blocks;
-import static data.dataInfo.exceptTime;
-import static data.dataInfo.timeRecord;
+import static data.dataInfo.*;
 
 /**
  * Created by EnjoyD on 2017/4/18.
@@ -131,7 +127,7 @@ public class CreatBlock {
         tem[lashHash.length+merkle.length+time.length]=difficulty;
         System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+time.length+1,nonce.length);
 //        MessageDigest digest = SHA256.getInstance();
-        byte []result=SHA256.getInstance().sha256(tem);
+        byte []result=SHA256x.digest(tem);
         return result;
     }
 

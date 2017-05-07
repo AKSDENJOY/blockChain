@@ -1,6 +1,7 @@
 package data;
 
 import java.nio.file.DirectoryStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.*;
@@ -17,6 +18,8 @@ public class dataInfo {
     public static ArrayList<Record> unidentifedRecord=new ArrayList<>();
 
     public static ArrayList<Integer> timeRecord=new ArrayList<>();
+
+    public static MessageDigest SHA256x;
 
     /**
      * 目标时间，期望平均多长时间产生一个区块，proof of work中为定值。

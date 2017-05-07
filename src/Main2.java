@@ -8,7 +8,10 @@ import sockets.verifyThread;
 import writeBlock.WriteBlock;
 
 import java.io.FileNotFoundException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import static data.dataInfo.SHA256x;
 
 /**
  * Created by EnjoyD on 2017/4/20.
@@ -16,10 +19,19 @@ import java.security.NoSuchAlgorithmException;
 public class Main2 {
     static {
         try {
-            creatFirstBlock.start();
+            SHA256x= MessageDigest.getInstance("SHA-256");
+            System.out.println("init success");
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("首区块创建");
+            System.out.println("init fail");
         }
+        try {
+            creatFirstBlock.start();
+            System.out.println("first block created");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("first block error ");
+        }
+
+
     }
 
     @Override
@@ -37,6 +49,8 @@ public class Main2 {
      * @param args
      */
     public static void main(String[] args) {
+        //初始化 digest
+
         //监听线程启动
         new Listener().start();
         //验证线程启动

@@ -9,9 +9,7 @@ import java.security.*;
 import java.security.spec.ECPoint;
 import java.util.Arrays;
 
-import static data.dataInfo.ECNAME;
-import static data.dataInfo.verifyRecord1;
-import static data.dataInfo.verifyRecord2;
+import static data.dataInfo.*;
 import static tools.toString.byteToString;
 
 /**
@@ -35,6 +33,12 @@ public class protocol {
         }
     }
     private static boolean verifyScriptRecord(Record record) {
+        MessageDigest digest= null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         //获得解锁脚本
         byte [] unLockScrpit=record.getUnLockScript();
         //获得锁定脚本
@@ -42,7 +46,7 @@ public class protocol {
         //验证公钥hash
         byte [] tem=new byte[40];
         System.arraycopy(unLockScrpit,0,tem,0,40);
-        byte [] temHash=SHA256.getInstance().sha256(tem);
+        byte [] temHash=digest.digest(tem);
         if (!Arrays.equals(temHash,LockScript))
             return false;
         //验证签名
@@ -59,7 +63,7 @@ public class protocol {
         System.arraycopy(mac,0,tem,0,6);
         System.arraycopy(orderStamp,0,tem,6,4);
         System.arraycopy(time,0,tem,10,4);
-        temHash= SHA256.getInstance().sha256(tem);
+        temHash= digest.digest(tem);
         boolean result=false;
         try {
             ECPublicKeyImpl publicKey = new ECPublicKeyImpl(new ECPoint(new BigInteger(1, x), new BigInteger(1, y)), ECUtil.getECParameterSpec(null, ECNAME));

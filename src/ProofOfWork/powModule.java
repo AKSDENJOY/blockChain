@@ -3,17 +3,11 @@ package ProofOfWork;
 import CreatBlock.CreatBlock;
 import data.Block;
 import firstBlock.creatFirstBlock;
-import tools.SHA256;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import static data.dataInfo.*;
 import static tools.toByte.intToByte;
-import static tools.toByte.intToOneByte;
 import static tools.toInt.byteToInt;
 
 /**
@@ -299,13 +293,12 @@ public class powModule {
         System.arraycopy(lashHash,0,tem,0,lashHash.length);
         System.arraycopy(merkle,0,tem,lashHash.length,merkle.length);
         tem[lashHash.length+merkle.length+4]=difficulty;
-        SHA256 sha256 = SHA256.getInstance();
         for (long i=0;i<0xffffffffL;i++){
             byte[]time=intToByte(getUnixTime());
             byte[]nonce=intToByte(i);
             System.arraycopy(time,0,tem,lashHash.length+merkle.length,time.length);
             System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+time.length+1,nonce.length);
-            if (isRight(sha256.sha256(tem),target)){
+            if (isRight(SHA256x.digest(tem),target)){
                 block.setNonce(nonce);
                 block.setTime(time);
                 blocks.addLast(block);

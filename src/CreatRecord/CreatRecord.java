@@ -4,7 +4,6 @@ import data.Record;
 import sun.security.ec.ECPrivateKeyImpl;
 import sun.security.ec.ECPublicKeyImpl;
 import sun.security.util.ECUtil;
-import tools.SHA256;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -107,7 +106,7 @@ public class CreatRecord {
         System.arraycopy(macAddress,0,tem,0,macAddress.length);
         System.arraycopy(orderStamp,0,tem,macAddress.length,orderStamp.length);
         System.arraycopy(time,0,tem,macAddress.length+orderStamp.length,time.length);
-        byte []sha= SHA256.getInstance().sha256(tem);
+        byte []sha= SHA256x.digest(tem);
         Signature sign=Signature.getInstance("SHA1withECDSA","SunEC");
         sign.initSign(privateKey);
         sign.update(sha);
@@ -127,7 +126,7 @@ public class CreatRecord {
         byte []result=new byte[x.length+y.length];
         System.arraycopy(x,0,result,0,x.length);
         System.arraycopy(y,0,result,x.length,y.length);
-        return SHA256.getInstance().sha256(result);
+        return SHA256x.digest(result);
     }
 
     private byte[] getMacAddress() {
