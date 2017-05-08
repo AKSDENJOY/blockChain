@@ -4,11 +4,11 @@ package data;
  * Created by EnjoyD on 2017/4/18.
  */
 public class Record {
-    private byte []mac;
-    private byte []orderStamp;
-    private byte []time;
-    private byte []lockScript;
-    private byte []unLockScript;
+    private byte []mac;//6字节
+    private byte []orderStamp;//4字节
+    private byte []time;//4
+    private byte []lockScript;//32
+    private byte []unLockScript;//80-100
 
     public byte[] getLockScript() {
         return lockScript;

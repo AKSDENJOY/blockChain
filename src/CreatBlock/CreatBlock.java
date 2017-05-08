@@ -109,6 +109,7 @@ public class CreatBlock {
 
     private byte[] generateMerkle() {
         //从池中取记录 打包成默克尔树这个地方需要进行全局操作，比如取记录
+
         return new byte[32];//暂时这样
 
     }

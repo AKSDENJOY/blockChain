@@ -18,10 +18,13 @@ public class dataInfo {
      */
     public static LinkedBlockingQueue<Record> verifyRecord1 = new LinkedBlockingQueue<>();
     /**
-     * 全部验证完成后的纪录池
+     * 验证完时间与顺序戳后的未使用纪录池
      */
     public static ConcurrentHashMap<String,Record> verifyRecord2=new ConcurrentHashMap<>();
-    public static ArrayList<Record> unidentifedRecord=new ArrayList<>();
+    /**
+     * 验证完成后的记录池，用以创建默克尔树。
+     */
+    public static ArrayList<Record> identifedRecord=new ArrayList<>();
 
     public static ArrayList<Integer> timeRecord=new ArrayList<>();
 

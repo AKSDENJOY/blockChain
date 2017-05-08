@@ -2,19 +2,20 @@ package sockets;
 
 import data.Record;
 
+import static data.dataInfo.identifedRecord;
 import static data.dataInfo.verifyRecord1;
 import static data.dataInfo.verifyRecord2;
 import static tools.toInt.byteToInt;
 import static tools.toString.byteToString;
 
-/**
+/** 验证线程
  * Created by EnjoyD on 2017/5/4.
  */
 public class verifyThread extends Thread{
     @Override
     public void run() {
         while (true) {
-            Record record = null;
+            Record record;
             try {
                 record = verifyRecord1.take();
             } catch (InterruptedException e) {
@@ -23,6 +24,7 @@ public class verifyThread extends Thread{
             if (verifyStamp(record) && verifyTime(record)) {
                 String key = byteToString(record.getLockScript());
                 verifyRecord2.put(key, record);
+                identifedRecord.add(record);
             }
         }
     }

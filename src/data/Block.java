@@ -14,7 +14,8 @@ public class Block {
 
     private byte data[];
 
-    private int blockNumber;
+    private int blockNumber;//4字节
+    private int recordCount;//3字节
 
     public Block(){
 
