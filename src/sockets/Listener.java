@@ -12,9 +12,11 @@ import java.util.Iterator;
 
 import static data.dataInfo.PORT;
 import static data.dataInfo.verifyRecord1;
+import static data.dataInfo.verifyRecord2;
 import static tools.protocol.dealRecord;
 import static tools.protocol.dealRegistRecord;
 import static tools.toByte.intToByte;
+import static tools.toString.byteToString;
 
 /**
  * Created by EnjoyD on 2017/5/2.
@@ -64,7 +66,7 @@ class handleThread implements Runnable {
             int i;
             byte tem[];
             switch (tag) {
-                case 0x00:
+                case 0x00://新用户注册进区块链
                     //admin
                     record = new Record();
                     receive = new byte[6];
@@ -86,8 +88,7 @@ class handleThread implements Runnable {
                     record.setUnLockScript(tem);
                     dealRegistRecord(record);
                     break;
-                case 0x01:
-                    //收到record
+                case 0x01://收到区块
                     record = new Record();
                     receive = new byte[6];
                     in.read(receive);
@@ -110,9 +111,12 @@ class handleThread implements Runnable {
                     this.socket.close();
 //                in.read(receive);
                     break;
-                case 02:
+                case 0x02:
                     sendResult(out);
                     this.socket.close();
+                    break;
+                case 0x03://查询顺序戳
+                    sendOrderStamp(in,out);
                     break;
                 default:
                     break;
@@ -120,6 +124,18 @@ class handleThread implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendOrderStamp(DataInputStream in, DataOutputStream out) throws IOException {
+        byte [] receive=new byte[32];
+        in.read(receive);
+        String key=byteToString(receive);
+        if (!verifyRecord2.containsKey(key)){
+            out.write(new byte[4]);
+        }
+        Record record=verifyRecord2.get(key);
+        out.write(record.getOrderStamp());
+
     }
 
     private static void sendResult(OutputStream out) throws IOException {

@@ -13,7 +13,13 @@ import java.util.concurrent.*;
 public class dataInfo {
     private dataInfo(){};
     public static LinkedList<Block> blocks= new LinkedList<>();
+    /**
+     * 验证完脚本后的纪录池
+     */
     public static LinkedBlockingQueue<Record> verifyRecord1 = new LinkedBlockingQueue<>();
+    /**
+     * 全部验证完成后的纪录池
+     */
     public static ConcurrentHashMap<String,Record> verifyRecord2=new ConcurrentHashMap<>();
     public static ArrayList<Record> unidentifedRecord=new ArrayList<>();
 

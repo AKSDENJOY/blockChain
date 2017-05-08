@@ -25,7 +25,6 @@ public class verifyThread extends Thread{
         }
     }
 
-
     private boolean verifyTime(Record record) {
         String key=byteToString(record.getLockScript());
         if (byteToInt(verifyRecord2.get(key).getTime())<byteToInt(record.getTime()))
