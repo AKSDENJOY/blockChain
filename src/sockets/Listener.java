@@ -118,6 +118,8 @@ class handleThread implements Runnable {
                 case 0x03://查询顺序戳
                     sendOrderStamp(in,out);
                     break;
+                case 0x0f://测试链接
+                    break;
                 default:
                     break;
             }

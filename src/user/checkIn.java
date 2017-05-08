@@ -20,6 +20,7 @@ public class checkIn {
         Socket socket= null;
         try {
             socket = new Socket(ROOTIP,PORT);
+            socket.getOutputStream().write(0x0f);
             socket.close();
         } catch (IOException e) {
             System.out.println("error in network please check the net connection");

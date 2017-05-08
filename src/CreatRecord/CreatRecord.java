@@ -121,6 +121,7 @@ public class CreatRecord {
         out.write(lockScrpit);
         byte orderStamp[] = new byte[4];
         in.read(orderStamp);
+        socket.close();
         int tem = byteToInt(orderStamp);
         if (tem == 0)
             System.out.println("order Stamp 查询失败");
