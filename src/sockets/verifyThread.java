@@ -13,25 +13,27 @@ import static tools.toString.byteToString;
 public class verifyThread extends Thread{
     @Override
     public void run() {
-        Record record= null;
-        try {
-            record = verifyRecord1.take();
-        } catch (InterruptedException e) {
-            return;
-        }
-        if (verifyStamp(record)&&verifyTime(record)){
-            String key=byteToString(record.getLockScript());
-            verifyRecord2.put(key,record);
+        while (true) {
+            Record record = null;
+            try {
+                record = verifyRecord1.take();
+            } catch (InterruptedException e) {
+                return;
+            }
+            if (verifyStamp(record) && verifyTime(record)) {
+                String key = byteToString(record.getLockScript());
+                verifyRecord2.put(key, record);
+            }
         }
     }
 
-    private boolean verifyTime(Record record) {
+    private boolean verifyTime(Record record) {//此处验证需要扩展，比如时间上后面的先于前面的到达，需要进行重新入队处理，目前仅做简单处理
         String key=byteToString(record.getLockScript());
         if (byteToInt(verifyRecord2.get(key).getTime())<byteToInt(record.getTime()))
             return true;
         return false;
     }
-    private boolean verifyStamp(Record record) {
+    private boolean verifyStamp(Record record) {//此处验证需要扩展，比如顺序上后面的先于前面的到达，需要进行重新入队处理
         String key=byteToString(record.getLockScript());
         if (byteToInt(verifyRecord2.get(key).getOrderStamp())+1==byteToInt(record.getOrderStamp()))
             return true;
