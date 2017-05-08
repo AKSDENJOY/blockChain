@@ -42,7 +42,12 @@ public class CreatRecord {
         }
         System.out.println(macAddress.length);
         //生成锁定脚本
-        byte[] lockScript = getLockScript(publicKey);
+        byte[] lockScript = new byte[0];
+        try {
+            lockScript = getLockScript(publicKey);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         System.out.println("32 " + lockScript.length);
         //向全节点根据pubkey查找顺序戳
         byte[] orderStamp;
@@ -128,7 +133,7 @@ public class CreatRecord {
         System.arraycopy(macAddress, 0, tem, 0, macAddress.length);
         System.arraycopy(orderStamp, 0, tem, macAddress.length, orderStamp.length);
         System.arraycopy(time, 0, tem, macAddress.length + orderStamp.length, time.length);
-        byte[] sha = SHA256x.digest(tem);
+        byte[] sha = MessageDigest.getInstance("SHA-256").digest(tem);
         Signature sign = Signature.getInstance("SHA1withECDSA", "SunEC");
         sign.initSign(privateKey);
         sign.update(sha);
@@ -142,13 +147,13 @@ public class CreatRecord {
         return finalResult;
     }
 
-    private byte[] getLockScript(ECPublicKeyImpl publicKey) {
+    private byte[] getLockScript(ECPublicKeyImpl publicKey) throws NoSuchAlgorithmException {
         byte[] x = hexStringToByteArray(String.format("%040x", publicKey.getW().getAffineX()));
         byte[] y = hexStringToByteArray(String.format("%040x", publicKey.getW().getAffineY()));
         byte[] result = new byte[x.length + y.length];
         System.arraycopy(x, 0, result, 0, x.length);
         System.arraycopy(y, 0, result, x.length, y.length);
-        return SHA256x.digest(result);
+        return MessageDigest.getInstance("SHA-256").digest(result);
     }
 
     private byte[] getMacAddress() {
@@ -197,7 +202,7 @@ public class CreatRecord {
         return keyPair;
     }
 
-    public Record registRecord(ECPublicKeyImpl publicKey, ECPrivateKeyImpl privateKey) {
+    public Record registRecord(ECPublicKeyImpl publicKey, ECPrivateKeyImpl privateKey) throws NoSuchAlgorithmException {
         //获取mac地址
         byte[] macAddress = getMacAddress();
         System.out.println(macAddress.length);
