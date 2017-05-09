@@ -111,20 +111,21 @@ public class CreatBlock {
         }
         while (result.size()!=1){
             ArrayDeque<byte []> temResult=new ArrayDeque<>();
-            byte []left=result.removeFirst();
-            byte []right=null;
-            try {
-                right = result.removeFirst();
-            }catch (NoSuchElementException e){}
-
-            if (right==null){
-                temResult.addLast(digest.digest(left));
-            }
-            else {
-                byte []tem=new byte[left.length+right.length];
-                System.arraycopy(left,0,tem,0,left.length);
-                System.arraycopy(right,0,tem,left.length,right.length);
-                temResult.addLast(digest.digest(tem));
+            while (!result.isEmpty()){
+                byte []left=result.removeFirst();
+                byte []right=null;
+                try {
+                    right = result.removeFirst();
+                }catch (NoSuchElementException e){}
+                if (right==null){
+                    temResult.addLast(digest.digest(left));
+                }
+                else {
+                    byte []tem=new byte[left.length+right.length];
+                    System.arraycopy(left,0,tem,0,left.length);
+                    System.arraycopy(right,0,tem,left.length,right.length);
+                    temResult.addLast(digest.digest(tem));
+                }
             }
             result=temResult;
         }
@@ -150,11 +151,20 @@ public class CreatBlock {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        creatFirstBlock.start();
-        CreatBlock creatBlock=new CreatBlock();
+        Block block=new Block();
+        Record record=new Record();
+        record.setLockScript(new byte[32]);
+        record.setMac(new byte[6]);
+        record.setTime(new byte[4]);
+        record.setOrderStamp(new byte[4]);
+        record.setUnLockScript(new byte[85]);
+        identifedRecord.add(record);
+        identifedRecord.add(record);
+        identifedRecord.add(record);
+        identifedRecord.add(record);
+        identifedRecord.add(record);
 
-        Block block=creatBlock.start();
-        System.out.println(block);
+        new CreatBlock().generateMerkle(block);
     }
 
 }

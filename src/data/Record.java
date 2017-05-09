@@ -57,7 +57,7 @@ public class Record {
 
     public byte [] getBytesData(){
         int i=mac.length+orderStamp.length+time.length+lockScript.length+unLockScript.length;
-        byte result[]=new byte[2];
+        byte result[]=new byte[2+i];
         byte tem[]=intToByte(i);
         System.arraycopy(tem,2,result,0,2);
         System.arraycopy(mac,0,result,2,mac.length);
