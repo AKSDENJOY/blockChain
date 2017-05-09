@@ -1,63 +1,28 @@
 package CreatBlock;
 
 import data.Block;
+import data.Record;
 import firstBlock.creatFirstBlock;
 
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayDeque;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static data.dataInfo.*;
 
-/**
+/** 创建区块
  * Created by EnjoyD on 2017/4/18.
  */
 public class CreatBlock {
-//region old version 有错误
-//    private byte[]nonce;
-//    private byte[] lastHashValue;
-//    private byte[]hashValue;
-//    private byte difficulty;
-//    public CreatBlock(powModule powModule){
-//        this.nonce=powModule.getNonce();
-//        this.lastHashValue= powModule.getLahsHashValue();
-//        this.hashValue=powModule.getHashValue();
-//        this.difficulty=powModule.getDifficulty();
-//    }
-//    public Block start(){
-//        byte[] merkle=creatMerkle();
-//        int time=getTime();
-//
-//
-//        return new Block(lastHashValue,merkle,time,difficulty,nonce);
-//    }
-//
-//
-//    public static void main(String[] args) {
-//
-//    }
-//
-//
-//
-//    private byte[] creatMerkle() {
-//        if (dataInfo.verifyRecord1.size()==0){//先进行此种测试
-//            byte []Merkle=new byte[32];
-//            for (int i=0;i<Merkle.length;i++){
-//                Merkle[i]=0;
-//            }
-//            return Merkle;
-//        }
-//        return new byte[0];
-//    }
-//
-//    public int getTime() {
-//        return (int) (System.currentTimeMillis()/1000);
-//    }
-    //endregion
+
     public Block start() throws NoSuchAlgorithmException {
         Block block=new Block();
         //获取前一区块哈希 32字节
         block.setLastHash(getLashHashValue());
-        //获取默克尔树 32字节
-        block.setMerkle(generateMerkle());
+        //获取默克尔树并填充blockdata 32字节
+        block.setMerkle(generateMerkle(block));
         //获取难度值
         block.setDifficulty(getDifficulty(blocks.getLast().getDifficulty()));
         //返回为完成的block
@@ -65,7 +30,7 @@ public class CreatBlock {
     }
 
     private byte getDifficulty(byte difficulty) {
-        if (timeRecord.size()==11){
+        if (timeRecord.size()==adjustCount){
             int avgTime=getAvgTime();
             byte Diff=difficulty;
             if (avgTime>exceptTime){
@@ -107,11 +72,63 @@ public class CreatBlock {
 
     }
 
-    private byte[] generateMerkle() {
+    private byte[] generateMerkle(Block block) {
         //从池中取记录 打包成默克尔树这个地方需要进行全局操作，比如取记录
+        ArrayDeque<byte []> result=new ArrayDeque<>();
+        int bytes=0;
+        //取出纪录
+        synchronized (identifedRecord) {
+            if (identifedRecord.size() == 0)
+                return new byte[32];
+            Iterator<Record> it = identifedRecord.iterator();
+            int i = 0;
+            while (i++ < merkleTreeLimitation && it.hasNext()) {
+                byte []tem=it.next().getBytesData();
+                bytes+=tem.length;
+                result.add(tem);
+                it.remove();
+            }
+        }
+        //填充block 的data数据
+        byte BlockData[]=new byte[bytes];
+        bytes=0;
+        for (byte[] tem : result) {
+            System.arraycopy(tem, 0, BlockData, bytes, tem.length);
+            bytes += tem.length;
+        }
+        block.setData(BlockData);
+        //开始计算merkle tree root
+        MessageDigest digest= null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        for (int i=0;i<result.size();i++){
+            byte tem[]=result.removeFirst();
+            tem=digest.digest(tem);
+            result.addLast(tem);
+        }
+        while (result.size()!=1){
+            ArrayDeque<byte []> temResult=new ArrayDeque<>();
+            byte []left=result.removeFirst();
+            byte []right=null;
+            try {
+                right = result.removeFirst();
+            }catch (NoSuchElementException e){}
 
-        return new byte[32];//暂时这样
-
+            if (right==null){
+                temResult.addLast(digest.digest(left));
+            }
+            else {
+                byte []tem=new byte[left.length+right.length];
+                System.arraycopy(left,0,tem,0,left.length);
+                System.arraycopy(right,0,tem,left.length,right.length);
+                temResult.addLast(digest.digest(tem));
+            }
+            result=temResult;
+        }
+        return result.getFirst();
     }
 
     private byte[] getLashHashValue() throws NoSuchAlgorithmException {

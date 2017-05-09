@@ -1,5 +1,9 @@
 package data;
 
+import java.util.ArrayList;
+
+import static tools.toByte.intToByte;
+
 /**
  * Created by EnjoyD on 2017/4/18.
  */
@@ -9,6 +13,7 @@ public class Record {
     private byte []time;//4
     private byte []lockScript;//32
     private byte []unLockScript;//80-100
+
 
     public byte[] getLockScript() {
         return lockScript;
@@ -49,6 +54,20 @@ public class Record {
     public void setTime(byte[] time) {
         this.time = time;
     }
+
+    public byte [] getBytesData(){
+        int i=mac.length+orderStamp.length+time.length+lockScript.length+unLockScript.length;
+        byte result[]=new byte[2];
+        byte tem[]=intToByte(i);
+        System.arraycopy(tem,2,result,0,2);
+        System.arraycopy(mac,0,result,2,mac.length);
+        System.arraycopy(orderStamp,0,result,2+mac.length,orderStamp.length);
+        System.arraycopy(time,0,result,2+mac.length+orderStamp.length,time.length);
+        System.arraycopy(lockScript,0,result,2+mac.length+orderStamp.length+time.length,lockScript.length);
+        System.arraycopy(unLockScript,0,result,2+mac.length+orderStamp.length+time.length+lockScript.length,unLockScript.length);
+        return result;
+    }
+
 
 
 }

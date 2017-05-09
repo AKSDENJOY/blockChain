@@ -34,7 +34,7 @@ public class Main {
 //        byte[] sign=hexStringToByteArray(fouth);
 //        Signature signature=Signature.getInstance("SHA1withECDSA","SunEC");
 //        signature.initVerify(publicKey);
-//        signature.update(fifth.getBytes(StandardCharsets.UTF_8));
+//        signature.update(fifth.getBytesData(StandardCharsets.UTF_8));
 //        System.out.println(signature.verify(sign));
 
     }

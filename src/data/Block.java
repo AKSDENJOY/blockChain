@@ -15,7 +15,8 @@ public class Block {
     private byte data[];
 
     private int blockNumber;//4字节
-    private int recordCount;//3字节
+    private int recordCount;//2字节
+    private int byteCount;
 
     public Block(){
 
@@ -80,5 +81,13 @@ public class Block {
                 "diff:"+(difficulty&0xff)+"\n"+
                 "time:"+byteToInt(time);
 
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 }

@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  * Created by EnjoyD on 2017/4/18.
  */
 public class dataInfo {
-    private dataInfo(){};
+    private dataInfo(){}
     public static LinkedList<Block> blocks= new LinkedList<>();
     /**
      * 验证完脚本后的纪录池
@@ -25,8 +25,16 @@ public class dataInfo {
      * 验证完成后的记录池，用以创建默克尔树。
      */
     public static ArrayList<Record> identifedRecord=new ArrayList<>();
-
+    /**
+     * timeRecord  时间纪录，用以存储adjustCount个区块时间
+     * adjustCount 需要多少个区块进行一次难度调整
+     */
     public static ArrayList<Integer> timeRecord=new ArrayList<>();
+    public static int adjustCount=10;
+    /**
+     * 区块能包含的最大条目数
+     */
+    public static int merkleTreeLimitation=64;
 
     public static MessageDigest SHA256x;
 
