@@ -89,6 +89,8 @@ public class CreatBlock {
                 it.remove();
             }
         }
+        //填充block recordCount数据
+        block.setRecordCount(result.size());
         //填充block 的data数据
         byte BlockData[]=new byte[bytes];
         bytes=0;
@@ -151,6 +153,8 @@ public class CreatBlock {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
+        byte tem[]=new byte[0];
+        System.out.println(tem.length);
         Block block=new Block();
         Record record=new Record();
         record.setLockScript(new byte[32]);
@@ -164,7 +168,13 @@ public class CreatBlock {
         identifedRecord.add(record);
         identifedRecord.add(record);
 
-        new CreatBlock().generateMerkle(block);
+        block.setMerkle(new CreatBlock().generateMerkle(block));
+        block.setLastHash(new byte[32]);
+        block.setDifficulty((byte) 0x01);
+        block.setTime(new byte[4]);
+        block.setNonce(new byte[4]);
+        block.setBlockNumber(1);
+        block.getBlockDatas();
     }
 
 }

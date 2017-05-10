@@ -3,8 +3,10 @@ package writeBlock;
 import data.Block;
 
 import java.io.*;
+import java.nio.channels.FileChannel;
 
 import static data.dataInfo.blocks;
+import static data.dataInfo.identifedRecord;
 import static data.dataInfo.location;
 
 /**
@@ -16,16 +18,18 @@ public class WriteBlock {
         this.block=block;
     }
     public void start() throws FileNotFoundException {
-//        write();
+        write();
     }
 
     private void write() throws FileNotFoundException {
         System.out.println("write");
-        if (blocks.size()<11){
-            return;
+        RandomAccessFile file=new RandomAccessFile(location,"w");
+        try {
+            file.seek(file.length());
+            file.write(block.getBlockDatas());
+            file.close();
+        }catch (IOException e) {
+            System.out.println("error in writeBlock");
         }
-        BufferedOutputStream out=new BufferedOutputStream(new FileOutputStream(location));
-        //开始写先解决别的问题，然后再来进行。
-
     }
 }

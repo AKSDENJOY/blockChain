@@ -45,7 +45,7 @@ public class dataInfo {
     /**
      * 区块存储位置
      */
-    public static final String location=".";
+    public static final String location="blockTest";
 
     public static int num=0;
 

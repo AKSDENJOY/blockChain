@@ -1,5 +1,6 @@
 package data;
 
+import static tools.toByte.intToByte;
 import static tools.toInt.byteToInt;
 
 /**
@@ -14,9 +15,9 @@ public class Block {
 
     private byte data[];
 
-    private int blockNumber;//4字节
-    private int recordCount;//2字节
-    private int byteCount;
+    private byte[] blockNumber;//3字节
+    private byte[] recordCount;//2字节
+
 
     public Block(){
 
@@ -62,12 +63,15 @@ public class Block {
         this.nonce = nonce;
     }
 
-    public int getBlockNumber() {
+    public byte[] getBlockNumber() {
         return blockNumber;
     }
 
     public void setBlockNumber(int blockNumber) {
-        this.blockNumber = blockNumber;
+        byte[]tem=intToByte(blockNumber);
+        byte[]result=new byte[3];
+        System.arraycopy(tem,1,result,0,3);
+        this.blockNumber = result;
     }
 
     public int getBlockByteNum(){
@@ -89,5 +93,32 @@ public class Block {
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    public byte[] getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(int recordCount) {
+        byte[]tem=intToByte(recordCount);
+        byte[]result=new byte[2];
+        System.arraycopy(tem,2,result,0,2);
+        this.recordCount = result;
+    }
+
+    public byte[] getBlockDatas(){
+        int i=lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length+data.length;
+        byte result[]=new byte[2+i];
+        byte tem[]=intToByte(i);
+        System.arraycopy(tem,2,result,0,2);
+        System.arraycopy(lastHash,0,result,2,lastHash.length);
+        System.arraycopy(Merkle,0,result,2+lastHash.length,Merkle.length);
+        System.arraycopy(time,0,result,2+lastHash.length+Merkle.length,time.length);
+        result[2+lastHash.length+Merkle.length+time.length]=difficulty;
+        System.arraycopy(nonce,0,result,2+lastHash.length+Merkle.length+time.length+1,nonce.length);
+        System.arraycopy(blockNumber,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length,blockNumber.length);
+        System.arraycopy(recordCount,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length,recordCount.length);
+        System.arraycopy(data,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length,data.length);
+        return result;
     }
 }
