@@ -82,7 +82,6 @@ public class CreatBlock {
                 block.setRecordCount(0);
                 block.setData(new byte[0]);
                 return new byte[32];
-
             }
             Iterator<Record> it = identifedRecord.iterator();
             int i = 0;

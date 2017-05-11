@@ -7,11 +7,13 @@ import sockets.Listener;
 import sockets.verifyThread;
 import writeBlock.WriteBlock;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static data.dataInfo.SHA256x;
+import static data.dataInfo.location;
 
 /** 主程序
  * Created by EnjoyD on 2017/4/20.
@@ -49,7 +51,9 @@ public class Main2 {
      * @param args 无
      */
     public static void main(String[] args) {
-        //初始化 digest
+        //初始化
+        File file=new File(location);
+        file.delete();
 
         //监听线程启动
         new Listener().start();
