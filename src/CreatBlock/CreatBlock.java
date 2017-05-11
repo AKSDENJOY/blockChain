@@ -78,8 +78,12 @@ public class CreatBlock {
         int bytes=0;
         //取出纪录
         synchronized (identifedRecord) {
-            if (identifedRecord.size() == 0)
+            if (identifedRecord.size() == 0){
+                block.setRecordCount(0);
+                block.setData(new byte[0]);
                 return new byte[32];
+
+            }
             Iterator<Record> it = identifedRecord.iterator();
             int i = 0;
             while (i++ < merkleTreeLimitation && it.hasNext()) {

@@ -23,7 +23,7 @@ public class WriteBlock {
 
     private void write() throws FileNotFoundException {
         System.out.println("write");
-        RandomAccessFile file=new RandomAccessFile(location,"w");
+        RandomAccessFile file=new RandomAccessFile(location,"rw");
         try {
             file.seek(file.length());
             file.write(block.getBlockDatas());
