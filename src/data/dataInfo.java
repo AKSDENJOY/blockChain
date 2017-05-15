@@ -46,6 +46,10 @@ public class dataInfo {
      * 区块存储位置
      */
     public static final String location="blockTest";
+    /**
+     * 区块索引
+     */
+    public static ArrayList<Long> indexBlock=new ArrayList<>();
 
     public static int num=0;
 

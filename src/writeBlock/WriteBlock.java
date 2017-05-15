@@ -5,9 +5,7 @@ import data.Block;
 import java.io.*;
 import java.nio.channels.FileChannel;
 
-import static data.dataInfo.blocks;
-import static data.dataInfo.identifedRecord;
-import static data.dataInfo.location;
+import static data.dataInfo.*;
 
 /**
  * Created by EnjoyD on 2017/4/20.
@@ -26,6 +24,7 @@ public class WriteBlock {
         RandomAccessFile file=new RandomAccessFile(location,"rw");
         try {
             file.seek(file.length());
+            indexBlock.add(file.length());
             file.write(block.getBlockDatas());
             file.close();
         }catch (IOException e) {

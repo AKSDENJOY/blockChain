@@ -23,6 +23,7 @@ public class creatFirstBlock {
             block.setDifficulty((byte) 0x0c);
             block.setBlockNumber(num);
             getNonceAndTime(block);
+            indexBlock.add((long) 0);
 
         }
     }

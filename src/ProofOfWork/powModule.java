@@ -35,6 +35,8 @@ public class powModule {
             if (isRight(SHA256x.digest(tem),target)){
                 block.setNonce(nonce);
                 block.setTime(time);
+                if (blocks.size()>100)//缓存最近100个区块
+                    blocks.remove(0);
                 blocks.addLast(block);
                 timeRecord.add(byteToInt(time));
                 block.setBlockNumber(num++);
