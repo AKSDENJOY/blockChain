@@ -13,6 +13,7 @@ import java.security.spec.ECGenParameterSpec;
 import static data.dataInfo.ECNAME;
 import static data.dataInfo.PORT;
 import static data.dataInfo.ROOTIP;
+import static data.protocolInfo.REGISTER;
 
 /**
  * Created by EnjoyD on 2017/5/3.
@@ -43,7 +44,7 @@ public class registUser {
         Socket socket=new Socket(ROOTIP,PORT);
         OutputStream out=null;
         out=socket.getOutputStream();
-        out.write(0x00);
+        out.write(REGISTER);
         out.write(record.getMac());
         out.write(record.getOrderStamp());
         out.write(record.getTime());

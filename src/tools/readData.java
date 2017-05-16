@@ -17,7 +17,6 @@ public class readData {
     public static Block readSpecificBlock(int i) throws IOException {
         RandomAccessFile randomAccessFile=new RandomAccessFile(location, "r");
         long location=indexBlock.get(i);
-
         randomAccessFile.seek(location);
         byte []count=new byte[2];
         randomAccessFile.read(count);

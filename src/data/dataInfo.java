@@ -12,6 +12,10 @@ import java.util.concurrent.*;
  */
 public class dataInfo {
     private dataInfo(){}
+
+    /**
+     * 缓存区块
+     */
     public static LinkedList<Block> blocks= new LinkedList<>();
     /**
      * 验证完脚本后的纪录池
@@ -25,6 +29,11 @@ public class dataInfo {
      * 验证完成后的记录池，用以创建默克尔树。
      */
     public static ArrayList<Record> identifedRecord=new ArrayList<>();
+    /**
+     * 打包生成区块时保存的记录
+     */
+    public static ArrayList<Record> unPackageRecord=new ArrayList<>();
+
     /**
      * timeRecord  时间纪录，用以存储adjustCount个区块时间
      * adjustCount 需要多少个区块进行一次难度调整
@@ -50,6 +59,10 @@ public class dataInfo {
      * 区块索引
      */
     public static ArrayList<Long> indexBlock=new ArrayList<>();
+    /**
+     * 缓存区块数量
+     */
+    public static final int cacheBlockCount=20;
 
     public static int num=0;
 

@@ -86,9 +86,11 @@ public class CreatBlock {
             Iterator<Record> it = identifedRecord.iterator();
             int i = 0;
             while (i++ < merkleTreeLimitation && it.hasNext()) {
-                byte []tem=it.next().getBytesData();
+                Record record=it.next();
+                byte []tem=record.getBytesData();
                 bytes+=tem.length;
                 result.add(tem);
+                unPackageRecord.add(record);
                 it.remove();
             }
         }
@@ -156,28 +158,28 @@ public class CreatBlock {
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
-        byte tem[]=new byte[0];
-        System.out.println(tem.length);
-        Block block=new Block();
-        Record record=new Record();
-        record.setLockScript(new byte[32]);
-        record.setMac(new byte[6]);
-        record.setTime(new byte[4]);
-        record.setOrderStamp(new byte[4]);
-        record.setUnLockScript(new byte[85]);
-        identifedRecord.add(record);
-        identifedRecord.add(record);
-        identifedRecord.add(record);
-        identifedRecord.add(record);
-        identifedRecord.add(record);
-
-        block.setMerkle(new CreatBlock().generateMerkle(block));
-        block.setLastHash(new byte[32]);
-        block.setDifficulty((byte) 0x01);
-        block.setTime(new byte[4]);
-        block.setNonce(new byte[4]);
-        block.setBlockNumber(1);
-        block.getBlockDatas();
+//        byte tem[]=new byte[0];
+//        System.out.println(tem.length);
+//        Block block=new Block();
+//        Record record=new Record();
+//        record.setLockScript(new byte[32]);
+//        record.setMac(new byte[6]);
+//        record.setTime(new byte[4]);
+//        record.setOrderStamp(new byte[4]);
+//        record.setUnLockScript(new byte[85]);
+//        identifedRecord.add(record);
+//        identifedRecord.add(record);
+//        identifedRecord.add(record);
+//        identifedRecord.add(record);
+//        identifedRecord.add(record);
+//
+//        block.setMerkle(new CreatBlock().generateMerkle(block));
+//        block.setLastHash(new byte[32]);
+//        block.setDifficulty((byte) 0x01);
+//        block.setTime(new byte[4]);
+//        block.setNonce(new byte[4]);
+//        block.setBlockNumber(1);
+//        block.getBlockDatas();
     }
 
 }

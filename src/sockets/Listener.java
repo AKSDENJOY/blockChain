@@ -1,5 +1,6 @@
 package sockets;
 
+import data.Block;
 import data.Record;
 
 import java.io.DataInputStream;
@@ -8,14 +9,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
-import static data.dataInfo.PORT;
-import static data.dataInfo.verifyRecord1;
-import static data.dataInfo.verifyRecord2;
+import static data.dataInfo.*;
+import static data.protocolInfo.RECIVERECORD;
+import static data.protocolInfo.REGISTER;
+import static data.protocolInfo.SELFQUERY;
 import static tools.protocol.dealRecord;
 import static tools.protocol.dealRegistRecord;
 import static tools.toByte.intToByte;
+import static tools.toInt.byteToInt;
 import static tools.toString.byteToString;
 
 /**
@@ -66,7 +71,7 @@ class handleThread implements Runnable {
             int i;
             byte tem[];
             switch (tag) {
-                case 0x00://新用户注册进区块链
+                case REGISTER://新用户注册进区块链
                     //admin
                     record = new Record();
                     receive = new byte[6];
@@ -88,7 +93,7 @@ class handleThread implements Runnable {
                     record.setUnLockScript(tem);
                     dealRegistRecord(record);
                     break;
-                case 0x01://收到区块
+                case RECIVERECORD://收到纪录
                     record = new Record();
                     receive = new byte[6];
                     in.read(receive);
@@ -117,8 +122,13 @@ class handleThread implements Runnable {
                     break;
                 case 0x03://查询顺序戳
                     sendOrderStamp(in,out);
+                    this.socket.close();
                     break;
                 case 0x0f://测试链接
+                    break;
+                case SELFQUERY://查询个人记录
+                    startSearchIndividual(in,out);
+                    this.socket.close();
                     break;
                 default:
                     break;
@@ -126,6 +136,67 @@ class handleThread implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void startSearchIndividual(DataInputStream in, DataOutputStream out) throws IOException {
+        byte lockScrpit[]=new byte[32];
+        in.read(lockScrpit);
+        int count=10;//默认查询10条记录
+        ArrayList<Record> recordToBeSent=new ArrayList<>();
+        //先查未入块
+        synchronized (unPackageRecord){
+            for (Record record:unPackageRecord){
+                if (count==0){
+                    break;
+                }
+                if (Arrays.equals(record.getLockScript(),lockScrpit)){
+                    recordToBeSent.add(record);
+                    count--;
+                }
+            }
+        }
+        for (Record record:recordToBeSent){
+            out.write(record.getBytesData());
+            recordToBeSent.clear();
+        }
+        if (count==0){//不够默认数，继续查询
+            return;
+        }
+        //再查缓存块
+        synchronized (blocks){
+            x:for (Block block:blocks){
+                int recordCount=byteToInt(block.getRecordCount());
+                if (recordCount==0){
+                    continue;
+                }
+                else {
+                    byte tems[]=block.getData();
+                    int x=0;
+                    for (int i=0;i<recordCount;i++){
+                        if (count==0){
+                            break x;
+                        }
+                        byte temRecord[]=new byte[2];
+                        System.arraycopy(tems,x,temRecord,0,2);
+                        x+=2;
+                        temRecord=new byte[byteToInt(temRecord)];
+                        System.arraycopy(tems,x,temRecord,0,temRecord.length);
+                        x+=temRecord.length;
+                        Record record=new Record(temRecord);
+                        recordToBeSent.add(record);
+                        count--;
+                    }
+                }
+            }
+        }
+        for (Record record:recordToBeSent){
+            out.write(record.getBytesData());
+            recordToBeSent.clear();
+        }
+        if (count==0){//不够默认数，继续查询
+            return;
+        }
+        //再查硬盘 不查了 太耗性能
     }
 
     private void sendOrderStamp(DataInputStream in, DataOutputStream out) throws IOException {

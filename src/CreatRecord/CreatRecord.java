@@ -13,6 +13,7 @@ import java.security.spec.ECPoint;
 import java.util.Enumeration;
 
 import static data.dataInfo.*;
+import static data.protocolInfo.RECIVERECORD;
 import static tools.toByte.hexStringToByteArray;
 import static tools.toByte.intToByte;
 import static tools.toInt.byteToInt;
@@ -84,7 +85,7 @@ public class CreatRecord {
             socket = new Socket(ROOTIP, PORT);
             out = socket.getOutputStream();
             in = socket.getInputStream();
-            out.write(0x01);
+            out.write(RECIVERECORD);
             out.write(record.getMac());
             out.write(record.getOrderStamp());
             out.write(record.getTime());
