@@ -51,15 +51,19 @@ public class querySelfRecord {
         OutputStream out=socket.getOutputStream();
         out.write(SELFQUERY);
         out.write(lockScript);
-        while (true) {
-            byte[] tem = new byte[2];
-            in.read(tem);
-            tem = new byte[byteToInt(tem)];
-            in.read(tem);
-            Record record=new Record(tem);
-            System.out.println(record);
+        try {
+            while (true) {
+                byte[] tem = new byte[2];
+                in.read(tem);
+                tem = new byte[byteToInt(tem)];
+                in.read(tem);
+                Record record=new Record(tem);
+                System.out.println(record);
+            }
+        }catch (Exception e){
+            ;
         }
-
+        return;
     }
 
     private byte[] getLockScript() throws IOException, NoSuchAlgorithmException {
