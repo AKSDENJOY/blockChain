@@ -67,7 +67,6 @@ public class querySelfRecord {
     }
 
     private byte[] getLockScript() throws IOException, NoSuchAlgorithmException {
-        byte []lockScript=getLockScript();
         DataInputStream in = new DataInputStream(new FileInputStream("./key"));
         in.readUTF();
         String second = in.readUTF();
@@ -79,7 +78,11 @@ public class querySelfRecord {
         System.arraycopy(x, 0, result, 0, x.length);
         System.arraycopy(y, 0, result, x.length, y.length);
         return MessageDigest.getInstance("SHA-256").digest(result);
-
     }
+
+    public static void main(String[] args) {
+        new querySelfRecord().querySelfRecord();
+    }
+
 
 }
