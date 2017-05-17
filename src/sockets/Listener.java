@@ -1,5 +1,6 @@
 package sockets;
 
+import com.sun.jmx.remote.internal.ArrayQueue;
 import data.Block;
 import data.Record;
 
@@ -9,9 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 import static data.dataInfo.*;
 import static data.protocolInfo.RECIVERECORD;
@@ -73,25 +72,31 @@ class handleThread implements Runnable {
             switch (tag) {
                 case REGISTER://新用户注册进区块链
                     //admin
-                    record = new Record();
-                    receive = new byte[6];
+
+                    receive =new byte[2];
                     in.read(receive);
-                    record.setMac(receive);
-                    receive=new byte[4];
+                    receive=new byte[byteToInt(receive)];
                     in.read(receive);
-                    record.setOrderStamp(receive);
-                    receive=new byte[4];
-                    in.read(receive);
-                    record.setTime(receive);
-                    receive=new byte[32];
-                    in.read(receive);
-                    record.setLockScript(receive);
-                    receive=new byte[100];
-                    i=in.read(receive);
-                    tem=new byte[i];
-                    System.arraycopy(receive,0,tem,0,i);
-                    record.setUnLockScript(tem);
+                    record = new Record(receive);
+//                    receive = new byte[6];
+//                    in.read(receive);
+//                    record.setMac(receive);
+//                    receive=new byte[4];
+//                    in.read(receive);
+//                    record.setOrderStamp(receive);
+//                    receive=new byte[4];
+//                    in.read(receive);
+//                    record.setTime(receive);
+//                    receive=new byte[32];
+//                    in.read(receive);
+//                    record.setLockScript(receive);
+//                    receive=new byte[100];
+//                    i=in.read(receive);
+//                    tem=new byte[i];
+//                    System.arraycopy(receive,0,tem,0,i);
+//                    record.setUnLockScript(tem);
                     dealRegistRecord(record);
+                    this.socket.close();
                     break;
                 case RECIVERECORD://收到纪录
                     record = new Record();
@@ -134,7 +139,11 @@ class handleThread implements Runnable {
                     break;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                this.socket.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 
@@ -142,23 +151,42 @@ class handleThread implements Runnable {
         byte lockScrpit[]=new byte[32];
         in.read(lockScrpit);
         int count=10;//默认查询10条记录
-        ArrayList<Record> recordToBeSent=new ArrayList<>();
-        //先查未入块
+//        ArrayDeque<Record> recordToBeSent=new ArrayDeque<>();
+        Stack<Record> recordToBeSent=new Stack<>();
+        //已验证但未打包
+        synchronized (identifedRecord){
+            for (Record record:identifedRecord){
+                if (count==0)
+                    break;
+                if (Arrays.equals(record.getLockScript(),lockScrpit)){
+                    recordToBeSent.push(record);
+                    count--;
+                }
+            }
+        }
+        while (recordToBeSent.size()!=0)
+            out.write(recordToBeSent.pop().getBytesData());
+        if (count==0){//不够默认数，继续查询
+            return;
+        }
+        //已打包但为建块
         synchronized (unPackageRecord){
             for (Record record:unPackageRecord){
                 if (count==0){
                     break;
                 }
                 if (Arrays.equals(record.getLockScript(),lockScrpit)){
-                    recordToBeSent.add(record);
+                    recordToBeSent.push(record);
                     count--;
                 }
             }
         }
-        for (Record record:recordToBeSent){
-            out.write(record.getBytesData());
-            recordToBeSent.clear();
-        }
+        while (recordToBeSent.size()!=0)
+            out.write(recordToBeSent.pop().getBytesData());
+//        for (Record record:recordToBeSent){
+//            out.write(record.getBytesData());
+//        }
+//        recordToBeSent.clear();
         if (count==0){//不够默认数，继续查询
             return;
         }
@@ -183,16 +211,18 @@ class handleThread implements Runnable {
                         System.arraycopy(tems,x,temRecord,0,temRecord.length);
                         x+=temRecord.length;
                         Record record=new Record(temRecord);
-                        recordToBeSent.add(record);
+                        recordToBeSent.push(record);
                         count--;
                     }
                 }
             }
         }
-        for (Record record:recordToBeSent){
-            out.write(record.getBytesData());
-            recordToBeSent.clear();
-        }
+        while (recordToBeSent.size()!=0)
+            out.write(recordToBeSent.pop().getBytesData());
+//        for (Record record:recordToBeSent){
+//            out.write(record.getBytesData());
+//        }
+//        recordToBeSent.clear();
         if (count==0){//不够默认数，继续查询
             return;
         }

@@ -34,7 +34,7 @@ public class Record {
         setLockScript(tem);
         tem=new byte[bytes.length-6-4-4-32];
         System.arraycopy(bytes,6+4+4+32,tem,0,tem.length);
-        setLockScript(tem);
+        setUnLockScript(tem);
     }
 
 

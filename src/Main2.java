@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static data.dataInfo.SHA256x;
 import static data.dataInfo.location;
+import static data.dataInfo.unPackageRecord;
 
 /** 主程序
  * Created by EnjoyD on 2017/4/20.
@@ -32,6 +33,8 @@ public class Main2 {
             System.out.println("first block created");
         } catch (NoSuchAlgorithmException e) {
             System.out.println("first block error ");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
 
 
@@ -65,6 +68,8 @@ public class Main2 {
             creatFirstBlock.start();
         } catch (NoSuchAlgorithmException e) {
             System.out.println("error on first");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
         while (true) {
             //创建区块
@@ -91,6 +96,7 @@ public class Main2 {
             WriteBlock writeBlock = new WriteBlock(block);
             try {
                 writeBlock.start();
+                unPackageRecord.clear();
             } catch (FileNotFoundException e) {
                 System.out.println("写入失败");
                 continue;
