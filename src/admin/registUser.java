@@ -45,11 +45,7 @@ public class registUser {
         OutputStream out=null;
         out=socket.getOutputStream();
         out.write(REGISTER);
-        out.write(record.getMac());
-        out.write(record.getOrderStamp());
-        out.write(record.getTime());
-        out.write(record.getLockScript());
-        out.write(record.getUnLockScript());
+        out.write(record.getBytesData());
         out.close();
         System.out.println("regist over");
 
