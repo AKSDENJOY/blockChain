@@ -72,7 +72,7 @@ class handleThread implements Runnable {
             switch (tag) {
                 case REGISTER://新用户注册进区块链
                     //admin
-
+                    System.out.println("register");
                     receive =new byte[2];
                     in.read(receive);
                     receive=new byte[byteToInt(receive)];
@@ -99,6 +99,7 @@ class handleThread implements Runnable {
                     this.socket.close();
                     break;
                 case RECIVERECORD://收到纪录
+                    System.out.println("received record");
                     record = new Record();
                     receive = new byte[6];
                     in.read(receive);
@@ -132,13 +133,14 @@ class handleThread implements Runnable {
                 case 0x0f://测试链接
                     break;
                 case SELFQUERY://查询个人记录
+                    System.out.println("query self informaiton");
                     startSearchIndividual(in,out);
                     this.socket.close();
                     break;
                 default:
                     break;
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             try {
                 this.socket.close();
             } catch (IOException e1) {
@@ -210,6 +212,7 @@ class handleThread implements Runnable {
             for (int j=0;j<recordCount;j++){//找到区块中的lockscript区块
                 byte tem[]=new byte[2];
                 System.arraycopy(blockData,x,tem,0,2);
+                x+=2;
                 tem=new byte[byteToInt(tem)];
                 System.arraycopy(blockData,x,tem,0,tem.length);
                 x+=tem.length;
