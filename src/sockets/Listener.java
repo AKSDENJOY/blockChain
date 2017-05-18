@@ -152,77 +152,80 @@ class handleThread implements Runnable {
         in.read(lockScrpit);
         int count=10;//默认查询10条记录
 //        ArrayDeque<Record> recordToBeSent=new ArrayDeque<>();
-        Stack<Record> recordToBeSent=new Stack<>();
+        ArrayList<Record> recordToBeSent=new ArrayList<>();
         //已验证但未打包
-        synchronized (identifedRecord){
-            for (Record record:identifedRecord){
+        synchronized (identifedRecord){//从后向前遍历保证顺序
+            int size=identifedRecord.size();
+            for (int i=0;i<size;i++){
                 if (count==0)
                     break;
-                if (Arrays.equals(record.getLockScript(),lockScrpit)){
-                    recordToBeSent.push(record);
+                if (Arrays.equals(identifedRecord.get(size-1-i).getLockScript(),lockScrpit)){
+                    recordToBeSent.add(identifedRecord.get(size-1-i));
                     count--;
                 }
             }
         }
-        while (recordToBeSent.size()!=0)
-            out.write(recordToBeSent.pop().getBytesData());
+        for (Record record:recordToBeSent){
+            out.write(record.getBytesData());
+        }
+        recordToBeSent.clear();
         if (count==0){//不够默认数，继续查询
             return;
         }
         //已打包但为建块
-        synchronized (unPackageRecord){
-            for (Record record:unPackageRecord){
+        synchronized (unPackageRecord){//从后向前遍历保证顺序
+            int size=unPackageRecord.size();
+            for (int i=0;i<size;i++){
                 if (count==0){
                     break;
                 }
-                if (Arrays.equals(record.getLockScript(),lockScrpit)){
-                    recordToBeSent.push(record);
+                if (Arrays.equals(unPackageRecord.get(size-1-i).getLockScript(),lockScrpit)){
+                    recordToBeSent.add(unPackageRecord.get(size-1-i));
                     count--;
                 }
             }
         }
-        while (recordToBeSent.size()!=0)
-            out.write(recordToBeSent.pop().getBytesData());
-//        for (Record record:recordToBeSent){
-//            out.write(record.getBytesData());
-//        }
-//        recordToBeSent.clear();
+        for (Record record:recordToBeSent){
+            out.write(record.getBytesData());
+        }
+        recordToBeSent.clear();
         if (count==0){//不够默认数，继续查询
             return;
         }
+        ArrayList<Block> cacheBlocks=new ArrayList<>();
         //再查缓存块
-        synchronized (blocks){
-            x:for (Block block:blocks){
-                int recordCount=byteToInt(block.getRecordCount());
-                if (recordCount==0){
-                    continue;
-                }
-                else {
-                    byte tems[]=block.getData();
-                    int x=0;
-                    for (int i=0;i<recordCount;i++){
-                        if (count==0){
-                            break x;
-                        }
-                        byte temRecord[]=new byte[2];
-                        System.arraycopy(tems,x,temRecord,0,2);
-                        x+=2;
-                        temRecord=new byte[byteToInt(temRecord)];
-                        System.arraycopy(tems,x,temRecord,0,temRecord.length);
-                        x+=temRecord.length;
-                        Record record=new Record(temRecord);
-                        recordToBeSent.push(record);
-                        count--;
-                    }
-                }
+        synchronized (blocks){//从后向前遍历保证顺序，由于blocks是单向链表，此处以后优化
+            for (Block block:blocks){
+                cacheBlocks.add(block);
             }
         }
-        while (recordToBeSent.size()!=0)
-            out.write(recordToBeSent.pop().getBytesData());
-//        for (Record record:recordToBeSent){
-//            out.write(record.getBytesData());
-//        }
-//        recordToBeSent.clear();
+        int BlockSize=cacheBlocks.size();
+        i:for (int i=0;i<BlockSize;i++){
+            int recordCount=byteToInt(cacheBlocks.get(BlockSize-1-i).getRecordCount());
+            if (recordCount==0)// block contian no record
+                continue;
+            ArrayList<Record> cacheRecord=new ArrayList<>();
+            byte []blockData=cacheBlocks.get(BlockSize-1-i).getData();
+            int x =0;
+            for (int j=0;j<recordCount;j++){//找到区块中的lockscript区块
+                byte tem[]=new byte[2];
+                System.arraycopy(blockData,x,tem,0,2);
+                tem=new byte[byteToInt(tem)];
+                System.arraycopy(blockData,x,tem,0,tem.length);
+                x+=tem.length;
+                Record record=new Record(tem);
+                if (Arrays.equals(record.getLockScript(),lockScrpit))
+                    cacheRecord.add(record);
+            }
+            //倒序发送
+            for (int j=0;j<cacheRecord.size();j++){
+                if (count==0)
+                    break i;
+                out.write(cacheRecord.get(cacheRecord.size()-1-j).getBytesData());
+                count--;
+            }
+            cacheRecord.clear();
+        }
         if (count==0){//不够默认数，继续查询
             return;
         }
