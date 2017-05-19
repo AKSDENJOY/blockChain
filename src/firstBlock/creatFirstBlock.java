@@ -33,7 +33,11 @@ public class creatFirstBlock {
     }
 
     private static void getNonceAndTime(Block block) throws NoSuchAlgorithmException {
-        findNonceAndTime(block);
+        try {
+            findNonceAndTime(block);
+        } catch (InterruptedException e) {
+            System.out.println("error in firstBlock");
+        }
     }
 
 

@@ -12,10 +12,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
 
-import static data.dataInfo.SHA256x;
-import static data.dataInfo.location;
-import static data.dataInfo.unPackageRecord;
+import static data.dataInfo.*;
 
 /** 主程序
  * Created by EnjoyD on 2017/4/20.
@@ -71,37 +70,55 @@ public class Main2 {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        while (true) {
-            //创建区块
-            CreatBlock creatBlock = new CreatBlock();
-            Block block ;
-            try {
-                block = creatBlock.start();
-            } catch (NoSuchAlgorithmException e) {
-                System.out.println("创建区块失败");
-                continue;
-            }
-            //pow找hash值完成区块的最后nonce值部分并加入链中
-            powModule pow = new powModule();
-            try {
-                pow.start(block);
-            } catch (NoSuchAlgorithmException e) {
-                System.out.println("pow模块失败");
-                continue;
-            }
-            //广播区块
-            BroadcastBlock broadcastBlock = new BroadcastBlock(block);
-            broadcastBlock.start();
-            //写链中区块入硬盘
-            WriteBlock writeBlock = new WriteBlock(block);
-            try {
-                writeBlock.start();
-                unPackageRecord.clear();
-            } catch (FileNotFoundException e) {
-                System.out.println("写入失败");
-                continue;
-            }
-            System.out.println(block);
+        //核心线程启动
+        proofOfWork.execute(new coreProcess());
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        System.out.println("shut down the coreProcess,10's restart");
+        interuptPOW=true;
+
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        interuptPOW=false;
+        proofOfWork.execute(new coreProcess());
+//        while (true) {
+//            //创建区块
+//            CreatBlock creatBlock = new CreatBlock();
+//            Block block ;
+//            try {
+//                block = creatBlock.start();
+//            } catch (NoSuchAlgorithmException e) {
+//                System.out.println("创建区块失败");
+//                continue;
+//            }
+//            //pow找hash值完成区块的最后nonce值部分并加入链中
+//            powModule pow = new powModule();
+//            try {
+//                pow.start(block);
+//            } catch (NoSuchAlgorithmException e) {
+//                System.out.println("pow模块失败");
+//                continue;
+//            }
+//            //广播区块
+//            BroadcastBlock broadcastBlock = new BroadcastBlock(block);
+//            broadcastBlock.start();
+//            //写链中区块入硬盘
+//            WriteBlock writeBlock = new WriteBlock(block);
+//            try {
+//                writeBlock.start();
+//                unPackageRecord.clear();
+//            } catch (FileNotFoundException e) {
+//                System.out.println("写入失败");
+//                continue;
+//            }
+//            System.out.println(block);
+//        }
     }
+
 }

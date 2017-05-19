@@ -12,11 +12,11 @@ import static tools.toInt.byteToInt;
  * Created by EnjoyD on 2017/4/10.
  */
 public class powModule {
-    public void start(Block block) throws NoSuchAlgorithmException {
+    public void start(Block block) throws NoSuchAlgorithmException, InterruptedException {
         findNonceAndTime(block);
     }
 
-    public static void findNonceAndTime(Block block) throws NoSuchAlgorithmException {
+    public static void findNonceAndTime(Block block) throws NoSuchAlgorithmException, InterruptedException {
         byte target[]=getTarget(block.getDifficulty());
         byte[] lashHash=block.getLastHash();
         byte[] merkle=block.getMerkle();
@@ -26,6 +26,10 @@ public class powModule {
         System.arraycopy(merkle,0,tem,lashHash.length,merkle.length);
         tem[lashHash.length+merkle.length+4]=difficulty;
         for (int i=0;true;i++){
+            if (Thread.currentThread().isInterrupted())
+                Thread.currentThread().sleep(1);
+            if (interuptPOW)
+                Thread.currentThread().interrupt();
             if (i==Integer.MAX_VALUE)
                 i=0;
             byte[]time=intToByte(getUnixTime());

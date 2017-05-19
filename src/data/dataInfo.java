@@ -63,6 +63,14 @@ public class dataInfo {
      * 缓存区块数量
      */
     public static final int cacheBlockCount=20;
+    /**
+     * pow 线程池
+     */
+    public static ExecutorService proofOfWork=Executors.newSingleThreadExecutor();
+    /**
+     * pow中断信号
+     */
+    public static boolean interuptPOW=false;
 
     public static int num=0;
 
