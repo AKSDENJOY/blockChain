@@ -13,6 +13,8 @@ import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.ECPoint;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static data.dataInfo.ECNAME;
 import static data.dataInfo.PORT;
@@ -58,7 +60,10 @@ public class querySelfRecord {
                 tem = new byte[byteToInt(tem)];
                 in.read(tem);
                 Record record=new Record(tem);
-                System.out.println(record);
+                System.out.print(record);
+                long time=(long)byteToInt(record.getTime());
+                System.out.println("   time : "+new SimpleDateFormat("YYYY-MM-dd-EEEE HH:mm:ss").format(new Date(time*1000)));
+
             }
         }catch (Exception e){
             ;
