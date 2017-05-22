@@ -48,9 +48,11 @@ public class dataInfo {
     public static MessageDigest SHA256x;
 
     /**
-     * 目标时间，期望平均多长时间产生一个区块，proof of work中为定值。
+     *  exceptTime 目标时间，期望平均多长时间产生一个区块，proof of work中为定值。
+     *  errorTime 时间误差，误差范围内时间不变
      */
-    public static final int exceptTime=20;//单位：秒
+    public static final int exceptTime=60;//单位：秒
+    public static final int errorTime=10;//单位：秒
     /**
      * 区块存储位置
      */
@@ -62,15 +64,15 @@ public class dataInfo {
     /**
      * 缓存区块数量
      */
-    public static final int cacheBlockCount=20;
+    public static final int cacheBlockCount=100;
     /**
-     * pow 线程池
+     * 核心线程，用来进行pow 广播 写入硬盘的顺序执行，将其线程模块化用以同步block时进行
      */
-    public static ExecutorService proofOfWork=Executors.newSingleThreadExecutor();
+    public static ExecutorService coreWork=Executors.newSingleThreadExecutor();
     /**
      * pow中断信号
      */
-    public static boolean interuptPOW=false;
+    public static boolean interupt =false;
 
     public static int num=0;
 
@@ -83,6 +85,13 @@ public class dataInfo {
 
     public static int getUnixTime(){
         return (int) (System.currentTimeMillis()/1000);
+    }
+
+    public static void interuptCoreThread(){
+        interupt=true;
+    }
+    public static void interuptReset(){
+        interupt=false;
     }
 
 }

@@ -33,10 +33,10 @@ public class CreatBlock {
         if (timeRecord.size()==adjustCount){
             int avgTime=getAvgTime();
             byte Diff=difficulty;
-            if (avgTime>exceptTime){
+            if (avgTime>exceptTime+errorTime){
                 Diff=decrease(difficulty);
             }
-            if (avgTime<exceptTime){
+            if (avgTime<exceptTime-errorTime){
                 Diff=increase(difficulty);
             }
             timeRecord.clear();

@@ -28,7 +28,7 @@ public class powModule {
         for (int i=0;true;i++){
             if (Thread.currentThread().isInterrupted())
                 Thread.currentThread().sleep(1);
-            if (interuptPOW)
+            if (interupt)
                 Thread.currentThread().interrupt();
             if (i==Integer.MAX_VALUE)
                 i=0;

@@ -1,12 +1,6 @@
-import CreatBlock.CreatBlock;
-import ProofOfWork.powModule;
-import broadcastBlock.BroadcastBlock;
-import data.Block;
 import firstBlock.creatFirstBlock;
 import sockets.Listener;
 import sockets.verifyThread;
-import writeBlock.WriteBlock;
-import tools.readData;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,22 +65,25 @@ public class Main2 {
             e.printStackTrace();
         }
         //核心线程启动
-        proofOfWork.execute(new coreProcess());
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("shut down the coreProcess,10's restart");
-        interuptPOW=true;
+        coreWork.execute(new coreProcess());
 
-        try {
-            TimeUnit.SECONDS.sleep(5);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        interuptPOW=false;
-        proofOfWork.execute(new coreProcess());
+        //region interupt test
+//        try {
+//            TimeUnit.SECONDS.sleep(5);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println("shut down the coreProcess,10's restart");
+//        interuptCoreThread();
+//
+//        try {
+//            TimeUnit.SECONDS.sleep(5);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        interuptReset();
+//        coreWork.execute(new coreProcess());
+        //endregion
 //        while (true) {
 //            //创建区块
 //            CreatBlock creatBlock = new CreatBlock();

@@ -22,7 +22,7 @@ public class creatFirstBlock {
 //            block.setTime(intToByte((int) (System.currentTimeMillis()/1000)));
             byte[]lastHash=SHA256x.digest("EnjoyTheDeath".getBytes(StandardCharsets.UTF_8));
             block.setLastHash(lastHash);
-            block.setDifficulty((byte) 0x0c);
+            block.setDifficulty((byte) 0x14);
             block.setBlockNumber(num);
             getNonceAndTime(block);
             block.setRecordCount(0);
