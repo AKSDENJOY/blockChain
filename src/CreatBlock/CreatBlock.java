@@ -52,13 +52,13 @@ public class CreatBlock {
 
     private byte increase(byte difficulty) {
         int i=difficulty&0xff;
-        i+=4;
+        i+=1;
         return (byte) i;
     }
 
     private byte decrease(byte difficulty) {
         int i=difficulty&0xff;
-        i-=4;
+        i-=1;
         return (byte) i;
 
     }

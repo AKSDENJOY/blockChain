@@ -61,14 +61,19 @@ public class powModule {
             if (hash[i] != target[i])
                 return false;
         }
-        if (target[target.length - 1] == -1) {
-            if (hash[target.length - 1] < 0 || hash[target.length - 1] > 16)//0x0f
-                return false;
-        } else {
-            if (hash[target.length - 1] != target[target.length - 1])//0x00
-                return false;
-        }
-        return true;
+        int temHash=hash[target.length-1]&0xff;
+        int temTarget=target[target.length-1]&0xff;
+
+        return temHash <= temTarget;
+
+//        if (target[target.length - 1] == -1) {
+//            if (hash[target.length - 1] < 0 || hash[target.length - 1] > 16)//0x0f
+//                return false;
+//        } else {
+//            if (hash[target.length - 1] != target[target.length - 1])//0x00
+//                return false;
+//        }
+//        return true;
 
     }
 
@@ -90,7 +95,29 @@ public class powModule {
         else {
             target=new byte[tem1+1];
             init(target);
-            target[tem1]=-1;
+            switch (tem2){
+                case 1:
+                    target[tem1]=0x7f;
+                    break;
+                case 2:
+                    target[tem1]=0x3f;
+                    break;
+                case 3:
+                    target[tem1]=0x1f;
+                    break;
+                case 4:
+                    target[tem1]=0x0f;
+                    break;
+                case 5:
+                    target[tem1]=0x07;
+                    break;
+                case 6:
+                    target[tem1]=0x03;
+                    break;
+                case 7:
+                    target[tem1]=0x01;
+                    break;
+            }
         }
         return target;
 
