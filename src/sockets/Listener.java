@@ -13,9 +13,7 @@ import java.net.Socket;
 import java.util.*;
 
 import static data.dataInfo.*;
-import static data.protocolInfo.RECIVERECORD;
-import static data.protocolInfo.REGISTER;
-import static data.protocolInfo.SELFQUERY;
+import static data.protocolInfo.*;
 import static tools.protocol.dealRecord;
 import static tools.protocol.dealRegistRecord;
 import static tools.toByte.intToByte;
@@ -137,6 +135,9 @@ class handleThread implements Runnable {
                     startSearchIndividual(in,out);
                     this.socket.close();
                     break;
+                case RECEIVEBLOCK:
+                    System.out.println("receive block");
+
                 default:
                     break;
             }
