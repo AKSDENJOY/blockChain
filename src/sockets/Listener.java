@@ -1,6 +1,5 @@
 package sockets;
 
-import com.sun.jmx.remote.internal.ArrayQueue;
 import data.Block;
 import data.Record;
 
@@ -20,7 +19,7 @@ import static tools.toByte.intToByte;
 import static tools.toInt.byteToInt;
 import static tools.toString.byteToString;
 
-/**
+/** 监听线程
  * Created by EnjoyD on 2017/5/2.
  */
 public class Listener extends Thread {
@@ -41,6 +40,7 @@ public class Listener extends Thread {
                 System.out.println("receive a connection");
             } catch (IOException e) {
                 e.printStackTrace();
+                continue;
             }
             new handleThread(socket);
         }
@@ -137,7 +137,11 @@ class handleThread implements Runnable {
                     break;
                 case RECEIVEBLOCK:
                     System.out.println("receive block");
-
+                    break;
+                case ADMINQUERY:
+                    System.out.println("admin query");
+                    startAdminQuery(in,out);
+                    break;
                 default:
                     break;
             }
@@ -147,7 +151,71 @@ class handleThread implements Runnable {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+        }finally {
+            try {
+                this.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    private void startAdminQuery(DataInputStream in, DataOutputStream out) throws IOException{
+        ArrayList<Record> recordToBeSent=new ArrayList<>();
+        synchronized (identifedRecord){//从后向前遍历保证顺序
+            int size=identifedRecord.size();
+            for (int i=0;i<size;i++){
+                recordToBeSent.add(identifedRecord.get(size-1-i));
+            }
+        }
+        for (Record record:recordToBeSent){
+            out.write(record.getBytesData());
+        }
+        recordToBeSent.clear();
+
+        //已打包但为建块
+        synchronized (unPackageRecord){//从后向前遍历保证顺序
+            int size=unPackageRecord.size();
+            for (int i=0;i<size;i++){
+                recordToBeSent.add(unPackageRecord.get(size-1-i));
+            }
+        }
+        for (Record record:recordToBeSent){
+            out.write(record.getBytesData());
+        }
+        recordToBeSent.clear();
+
+        ArrayList<Block> cacheBlocks=new ArrayList<>();
+        //再查缓存块
+        synchronized (blocks){//从后向前遍历保证顺序，由于blocks是单向链表，此处以后优化
+            cacheBlocks.addAll(blocks);
+        }
+        int BlockSize=cacheBlocks.size();
+        for (int i=0;i<BlockSize;i++){
+            int recordCount=byteToInt(cacheBlocks.get(BlockSize-1-i).getRecordCount());
+            if (recordCount==0)// block contian no record
+                continue;
+            ArrayList<Record> cacheRecord=new ArrayList<>();
+            byte []blockData=cacheBlocks.get(BlockSize-1-i).getData();
+            int x =0;
+            for (int j=0;j<recordCount;j++){//找到区块中的lockscript区块
+                byte tem[]=new byte[2];
+                System.arraycopy(blockData,x,tem,0,2);
+                x+=2;
+                tem=new byte[byteToInt(tem)];
+                System.arraycopy(blockData,x,tem,0,tem.length);
+                x+=tem.length;
+                Record record=new Record(tem);
+                cacheRecord.add(record);
+            }
+            //倒序发送
+            for (int j=0;j<cacheRecord.size();j++){
+                out.write(cacheRecord.get(cacheRecord.size()-1-j).getBytesData());
+            }
+            cacheRecord.clear();
+        }
+        //再查硬盘 不查了 太耗性能
+
     }
 
     private void startSearchIndividual(DataInputStream in, DataOutputStream out) throws IOException {

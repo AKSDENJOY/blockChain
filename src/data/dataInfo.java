@@ -16,7 +16,7 @@ public class dataInfo {
     /**
      * 缓存区块
      */
-    public static LinkedList<Block> blocks= new LinkedList<>();
+    public static final LinkedList<Block> blocks= new LinkedList<>();
     /**
      * 验证完脚本后的纪录池
      */
@@ -28,11 +28,11 @@ public class dataInfo {
     /**
      * 验证完成后的记录池，用以创建默克尔树。
      */
-    public static ArrayList<Record> identifedRecord=new ArrayList<>();
+    public static final ArrayList<Record> identifedRecord=new ArrayList<>();
     /**
      * 打包生成区块时保存的记录
      */
-    public static ArrayList<Record> unPackageRecord=new ArrayList<>();
+    public static final ArrayList<Record> unPackageRecord=new ArrayList<>();
 
     /**
      * timeRecord  时间纪录，用以存储adjustCount个区块时间
