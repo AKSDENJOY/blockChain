@@ -13,6 +13,7 @@ import static data.dataInfo.PORT;
 import static data.dataInfo.ROOTIP;
 import static data.protocolInfo.ADMINQUERY;
 import static tools.toInt.byteToInt;
+import static tools.toString.byteToString;
 
 /** 管理员查询
  * Created by EnjoyD on 2017/5/25.
@@ -34,8 +35,8 @@ public class adminQuery {
                     Record record=new Record(tem);
                     System.out.print(record);
                     long time=(long)byteToInt(record.getTime());
-                    System.out.println("   time : "+new SimpleDateFormat("YYYY-MM-dd-EEEE HH:mm:ss").format(new Date(time*1000)));
-
+                    System.out.print("   time : "+new SimpleDateFormat("YYYY-MM-dd-EEEE HH:mm:ss").format(new Date(time*1000))+"  ");
+                    System.out.println("lockScrpit: "+ byteToString(record.getLockScript()));
                 }
             }catch (Exception e){
                 System.out.println("receive over");

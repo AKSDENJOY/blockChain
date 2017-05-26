@@ -80,7 +80,7 @@ public class dataInfo {
 
     public static final int PORT=49999;
 
-    public static final String ROOTIP="172.18.204.2";
+    public static final String ROOTIP="10.170.66.106";
 
 
     public static int getUnixTime(){
