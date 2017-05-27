@@ -28,7 +28,7 @@ public class creatFirstBlock {
             block.setRecordCount(0);
             block.setData(new byte[0]);
             new WriteBlock(block).start();
-            indexBlock.add((long) 0);
+//            indexBlock.add((long) 0);
         }
     }
 

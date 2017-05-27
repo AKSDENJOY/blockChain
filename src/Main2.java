@@ -1,14 +1,17 @@
+import data.Block;
+import data.Record;
 import firstBlock.creatFirstBlock;
 import sockets.Listener;
 import sockets.verifyThread;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import static data.dataInfo.*;
+import static tools.toInt.byteToInt;
+import static tools.toString.byteToString;
 
 /** 主程序
  * Created by EnjoyD on 2017/4/20.
@@ -21,14 +24,7 @@ public class Main2 {
         } catch (NoSuchAlgorithmException e) {
             System.out.println("init fail");
         }
-        try {
-            creatFirstBlock.start();
-            System.out.println("first block created");
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("first block error ");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+
 
 
     }
@@ -49,9 +45,14 @@ public class Main2 {
      */
     public static void main(String[] args) {
         //初始化
-        File file=new File(location);
-        file.delete();
-
+//        File file=new File(location);
+//        file.delete();
+        try {
+            recoverFromDisk();
+        } catch (IOException e) {
+            System.out.println("error in recover");
+            return;
+        }
         //监听线程启动
         new Listener().start();
         //验证线程启动
@@ -84,38 +85,51 @@ public class Main2 {
 //        interuptReset();
 //        coreWork.execute(new coreProcess());
         //endregion
-//        while (true) {
-//            //创建区块
-//            CreatBlock creatBlock = new CreatBlock();
-//            Block block ;
-//            try {
-//                block = creatBlock.start();
-//            } catch (NoSuchAlgorithmException e) {
-//                System.out.println("创建区块失败");
-//                continue;
-//            }
-//            //pow找hash值完成区块的最后nonce值部分并加入链中
-//            powModule pow = new powModule();
-//            try {
-//                pow.start(block);
-//            } catch (NoSuchAlgorithmException e) {
-//                System.out.println("pow模块失败");
-//                continue;
-//            }
-//            //广播区块
-//            BroadcastBlock broadcastBlock = new BroadcastBlock(block);
-//            broadcastBlock.start();
-//            //写链中区块入硬盘
-//            WriteBlock writeBlock = new WriteBlock(block);
-//            try {
-//                writeBlock.start();
-//                unPackageRecord.clear();
-//            } catch (FileNotFoundException e) {
-//                System.out.println("写入失败");
-//                continue;
-//            }
-//            System.out.println(block);
-//        }
     }
-
+    public static void recoverFromDisk() throws IOException {
+        DataInputStream in=new DataInputStream(new FileInputStream(location));
+        long index=0;
+        byte tem[];
+        while (true){
+            //读取区块
+            tem=new byte[2];
+            in.read(tem);
+            int byteCount=byteToInt(tem);
+            if (byteCount==0)
+                break;
+            //建立索引
+            indexBlock.add(index);
+            tem=new byte[byteCount];
+            in.read(tem);
+            index+=(2+tem.length);
+            //复原区块
+            Block block=new Block(tem);
+            //添加区块缓存
+            if (blocks.size()>cacheBlockCount)//缓存最近cacheBlockCount个区块
+                blocks.remove(0);
+            blocks.addLast(block);
+            //添加time
+            if (timeRecord.size()==adjustCount)
+                timeRecord.clear();
+            timeRecord.add(byteToInt(block.getTime()));
+            //读取纪录
+            byte blockData[]=block.getData();
+            int x=0;
+            for (int i=0;i<byteToInt(block.getRecordCount());i++){
+                tem=new byte[2];
+                System.arraycopy(blockData,x,tem,0,2);
+                x+=2;
+                tem=new byte[byteToInt(tem)];
+                System.arraycopy(blockData,x,tem,0,tem.length);
+                x+=tem.length;
+                Record record=new Record(tem);
+                //添加未使用纪录
+                verifyRecord2.put(byteToString(record.getLockScript()),record);
+            }
+        }
+        in.close();
+        num=byteToInt(blocks.getLast().getBlockNumber())+1;
+        System.out.println("end");
+    }
+//
 }
