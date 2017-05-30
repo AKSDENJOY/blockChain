@@ -1,7 +1,7 @@
 package admin;
 
-import CreatRecord.CreatRecord;
-import data.Record;
+import joy.aksd.coreThread.CreatRecord;
+import joy.aksd.data.Record;
 import sun.security.ec.ECPrivateKeyImpl;
 import sun.security.ec.ECPublicKeyImpl;
 
@@ -10,10 +10,10 @@ import java.net.Socket;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 
-import static data.dataInfo.ECNAME;
-import static data.dataInfo.PORT;
-import static data.dataInfo.ROOTIP;
-import static data.protocolInfo.REGISTER;
+import static joy.aksd.data.dataInfo.ECNAME;
+import static joy.aksd.data.dataInfo.PORT;
+import static joy.aksd.data.dataInfo.ROOTIP;
+import static joy.aksd.data.protocolInfo.REGISTER;
 
 /**
  * Created by EnjoyD on 2017/5/3.

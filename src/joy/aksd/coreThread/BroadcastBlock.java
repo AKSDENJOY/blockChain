@@ -1,6 +1,6 @@
-package broadcastBlock;
+package joy.aksd.coreThread;
 
-import data.Block;
+import joy.aksd.data.Block;
 
 /**
  * Created by EnjoyD on 2017/4/20.

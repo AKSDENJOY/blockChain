@@ -1,15 +1,12 @@
 package user;
 
-import CreatRecord.CreatRecord;
+import joy.aksd.coreThread.CreatRecord;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
-import static data.dataInfo.PORT;
-import static data.dataInfo.ROOTIP;
+import static joy.aksd.data.dataInfo.PORT;
+import static joy.aksd.data.dataInfo.ROOTIP;
 
 /**
  * Created by EnjoyD on 2017/5/8.

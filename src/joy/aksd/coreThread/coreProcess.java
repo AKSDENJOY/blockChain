@@ -1,13 +1,11 @@
-import CreatBlock.CreatBlock;
-import ProofOfWork.powModule;
-import broadcastBlock.BroadcastBlock;
-import data.Block;
-import writeBlock.WriteBlock;
+package joy.aksd.coreThread;
+
+import joy.aksd.data.Block;
 
 import java.io.FileNotFoundException;
 import java.security.NoSuchAlgorithmException;
 
-import static data.dataInfo.unPackageRecord;
+import static joy.aksd.data.dataInfo.unPackageRecord;
 
 /**
  * Created by EnjoyD on 2017/5/19.
@@ -16,7 +14,7 @@ public class coreProcess implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("start coreProcess");
+        System.out.println("start joy.aksd.coreThread.coreProcess");
         while (true) {
             //创建区块
             CreatBlock creatBlock = new CreatBlock();
@@ -52,6 +50,6 @@ public class coreProcess implements Runnable{
             }
             System.out.println(block);
         }
-        System.out.println("coreProcess finished");
+        System.out.println("joy.aksd.coreThread.coreProcess finished");
     }
 }

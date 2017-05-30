@@ -1,11 +1,10 @@
-package writeBlock;
+package joy.aksd.coreThread;
 
-import data.Block;
+import joy.aksd.data.Block;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
 
-import static data.dataInfo.*;
+import static joy.aksd.data.dataInfo.*;
 
 /**
  * Created by EnjoyD on 2017/4/20.

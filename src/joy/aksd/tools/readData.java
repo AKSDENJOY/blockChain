@@ -1,14 +1,13 @@
-package tools;
+package joy.aksd.tools;
 
-import data.Block;
+import joy.aksd.data.Block;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import static data.dataInfo.indexBlock;
-import static data.dataInfo.location;
-import static tools.toInt.byteToInt;
+import static joy.aksd.data.dataInfo.indexBlock;
+import static joy.aksd.data.dataInfo.location;
+import static joy.aksd.tools.toInt.byteToInt;
 
 /**
  * Created by EnjoyD on 2017/5/15.

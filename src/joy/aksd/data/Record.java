@@ -1,11 +1,8 @@
-package data;
+package joy.aksd.data;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import static tools.toByte.intToByte;
-import static tools.toInt.byteToInt;
-import static tools.toString.byteToString;
+import static joy.aksd.tools.toByte.intToByte;
+import static joy.aksd.tools.toInt.byteToInt;
+import static joy.aksd.tools.toString.byteToString;
 
 /**
  * Created by EnjoyD on 2017/4/18.

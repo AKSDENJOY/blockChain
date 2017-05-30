@@ -1,6 +1,4 @@
-package tools;
-
-import java.nio.ByteBuffer;
+package joy.aksd.tools;
 
 /**
  * Created by EnjoyD on 2017/4/19.

@@ -1,12 +1,12 @@
-package sockets;
+package joy.aksd.listenAndVerifyThread;
 
-import data.Record;
+import joy.aksd.data.Record;
 
-import static data.dataInfo.identifedRecord;
-import static data.dataInfo.verifyRecord1;
-import static data.dataInfo.verifyRecord2;
-import static tools.toInt.byteToInt;
-import static tools.toString.byteToString;
+import static joy.aksd.data.dataInfo.identifedRecord;
+import static joy.aksd.data.dataInfo.verifyRecord1;
+import static joy.aksd.data.dataInfo.verifyRecord2;
+import static joy.aksd.tools.toInt.byteToInt;
+import static joy.aksd.tools.toString.byteToString;
 
 /** 验证线程
  * Created by EnjoyD on 2017/5/4.
@@ -41,4 +41,5 @@ public class verifyThread extends Thread{
             return true;
         return false;
     }
+
 }

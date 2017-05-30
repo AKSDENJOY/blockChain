@@ -1,8 +1,7 @@
-package CreatBlock;
+package joy.aksd.coreThread;
 
-import data.Block;
-import data.Record;
-import firstBlock.creatFirstBlock;
+import joy.aksd.data.Block;
+import joy.aksd.data.Record;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -10,7 +9,7 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static data.dataInfo.*;
+import static joy.aksd.data.dataInfo.*;
 
 /** 创建区块
  * Created by EnjoyD on 2017/4/18.
@@ -152,7 +151,6 @@ public class CreatBlock {
         System.arraycopy(time,0,tem,lashHash.length+merkle.length,time.length);
         tem[lashHash.length+merkle.length+time.length]=difficulty;
         System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+time.length+1,nonce.length);
-//        MessageDigest digest = SHA256.getInstance();
         byte []result=SHA256x.digest(tem);
         return result;
     }

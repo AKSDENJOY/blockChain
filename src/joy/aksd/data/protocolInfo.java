@@ -1,4 +1,4 @@
-package data;
+package joy.aksd.data;
 
 /** 协议设置
  * Created by EnjoyD on 2017/5/16.

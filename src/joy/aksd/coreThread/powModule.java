@@ -1,12 +1,12 @@
-package ProofOfWork;
+package joy.aksd.coreThread;
 
-import data.Block;
+import joy.aksd.data.Block;
 
 import java.security.NoSuchAlgorithmException;
 
-import static data.dataInfo.*;
-import static tools.toByte.intToByte;
-import static tools.toInt.byteToInt;
+import static joy.aksd.data.dataInfo.*;
+import static joy.aksd.tools.toByte.intToByte;
+import static joy.aksd.tools.toInt.byteToInt;
 
 /** 工作量证明模块
  * Created by EnjoyD on 2017/4/10.

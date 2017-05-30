@@ -1,14 +1,13 @@
-package firstBlock;
+package joy.aksd.coreThread;
 
-import data.Block;
-import writeBlock.WriteBlock;
+import joy.aksd.data.Block;
 
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
-import static ProofOfWork.powModule.findNonceAndTime;
-import static data.dataInfo.*;
+import static joy.aksd.coreThread.powModule.findNonceAndTime;
+import static joy.aksd.data.dataInfo.*;
 
 
 /**

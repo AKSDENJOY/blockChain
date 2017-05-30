@@ -1,6 +1,6 @@
 package admin;
 
-import data.Record;
+import joy.aksd.data.Record;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,11 +9,11 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static data.dataInfo.PORT;
-import static data.dataInfo.ROOTIP;
-import static data.protocolInfo.ADMINQUERY;
-import static tools.toInt.byteToInt;
-import static tools.toString.byteToString;
+import static joy.aksd.data.dataInfo.PORT;
+import static joy.aksd.data.dataInfo.ROOTIP;
+import static joy.aksd.data.protocolInfo.ADMINQUERY;
+import static joy.aksd.tools.toInt.byteToInt;
+import static joy.aksd.tools.toString.byteToString;
 
 /** 管理员查询
  * Created by EnjoyD on 2017/5/25.
