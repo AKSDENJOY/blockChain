@@ -44,9 +44,9 @@ public class Main2 {
      * @param args 无
      */
     public static void main(String[] args) {
-        //初始化
-//        File file=new File(location);
-//        file.delete();
+        //初始化 设置IP
+
+
         try {
             recoverFromDisk();
         } catch (IOException e) {
@@ -86,6 +86,9 @@ public class Main2 {
 //        coreWork.execute(new joy.aksd.coreThread.coreProcess());
         //endregion
     }
+
+
+
     public static void recoverFromDisk() throws IOException {
         DataInputStream in=new DataInputStream(new FileInputStream(location));
         long index=0;

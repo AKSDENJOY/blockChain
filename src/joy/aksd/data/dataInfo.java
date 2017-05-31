@@ -1,5 +1,8 @@
 package joy.aksd.data;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -79,7 +82,29 @@ public class dataInfo {
 
     public static final int PORT=49999;
 
-    public static final String ROOTIP="10.170.66.106";
+    public static String ROOTIP="";
+    public static final String IPLOCATION="ip.txt";
+    static {
+        try {
+            setIP();
+        } catch (IOException e) {
+            System.out.println("IP设置error");
+        }
+    }
+
+    private static void setIP() throws IOException {
+        BufferedReader reader=new BufferedReader(new FileReader(IPLOCATION));
+        String IP=reader.readLine();
+        reader.close();
+        if (checkIP(IP))
+            ROOTIP=IP;
+        else
+            throw new IOException();
+    }
+
+    public static boolean checkIP(String ip) {
+        return true;
+    }
 
 
     public static int getUnixTime(){
