@@ -33,7 +33,7 @@ public class readAndPrintData {
     public static void printRecord(Record record){
         System.out.print(record);
         long time=(long)byteToInt(record.getTime());
-        System.out.print("   time : "+new SimpleDateFormat("YYYY-MM-dd-EEEE HH:mm:ss").format(new Date(time*1000))+"  ");
+        System.out.println("   time : "+new SimpleDateFormat("YYYY-MM-dd-EEEE HH:mm:ss").format(new Date(time*1000))+"  ");
     }
 
     public static void main(String[] args) {

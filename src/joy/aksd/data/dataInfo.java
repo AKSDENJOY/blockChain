@@ -66,7 +66,7 @@ public class dataInfo {
     /**
      * 缓存区块数量
      */
-    public static final int cacheBlockCount=100;
+    public static final int cacheBlockCount=1000;
     /**
      * 核心线程，用来进行pow 广播 写入硬盘的顺序执行，将其线程模块化用以同步block时进行
      */
