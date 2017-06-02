@@ -7,11 +7,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 import static joy.aksd.data.dataInfo.PORT;
 import static joy.aksd.data.dataInfo.ROOTIP;
 import static joy.aksd.data.protocolInfo.ADMINQUERY;
+import static joy.aksd.tools.readAndPrintData.printRecord;
 import static joy.aksd.tools.toInt.byteToInt;
 import static joy.aksd.tools.toString.byteToString;
 
@@ -21,6 +22,7 @@ import static joy.aksd.tools.toString.byteToString;
 public class adminQuery {
     public void start(){
         Socket socket= null;
+        ArrayList<Record> result=new ArrayList<>();
         try {
             socket = new Socket(ROOTIP,PORT);
             InputStream in=socket.getInputStream();
@@ -33,10 +35,10 @@ public class adminQuery {
                     tem = new byte[byteToInt(tem)];
                     i=in.read(tem);
                     Record record=new Record(tem);
-                    System.out.print(record);
-                    long time=(long)byteToInt(record.getTime());
-                    System.out.print("   time : "+new SimpleDateFormat("YYYY-MM-dd-EEEE HH:mm:ss").format(new Date(time*1000))+"  ");
-                    System.out.println("lockScrpit: "+ byteToString(record.getLockScript()));
+                    printRecord(record);
+                    String key=byteToString(record.getLockScript());
+                    System.out.println("lockScrpit: "+ key);
+                    result.add(record);
                 }
             }catch (Exception e){
                 System.out.println("receive over");
@@ -52,6 +54,71 @@ public class adminQuery {
                 e.printStackTrace();
             }
         }
+        System.out.println("search over");
+        startClassifySearch(result);
+    }
+
+    private void startClassifySearch(ArrayList<Record> result) {
+        System.out.println(" 1 按人查询");
+        System.out.println(" 2 按时间由后向前查询");
+        System.out.println(" 0 结束");
+        Scanner sc=new Scanner(System.in);
+        while (sc.hasNext()){
+            String input=sc.nextLine();
+            if (input.length()!=1){
+                System.out.println("illegal input,please retry");
+                continue;
+            }
+            else {
+                try {
+                    int i=Integer.parseInt(input);
+                    if (dealClassifySearch(i,result))
+                        return;
+                    else
+                        continue;
+                }catch (NumberFormatException e){
+                    System.out.println("illegal input,please retry");
+                    continue;
+                }
+            }
+        }
+    }
+
+    private boolean dealClassifySearch(int i, ArrayList<Record> result) {
+        switch (i){
+            case 0:
+                return true;
+            case 1:
+                HashMap<String,ArrayList<Record>> peopleResult=new HashMap<>();
+                Iterator<Record> it=result.iterator();
+                while (it.hasNext()){
+                    Record record=it.next();
+                    String key=byteToString(record.getLockScript());
+                    if (!peopleResult.containsKey(key)){
+                        ArrayList<Record> temList=new ArrayList<>();
+                        temList.add(record);
+                        peopleResult.put(key,temList);
+                    }
+                    else {
+                        peopleResult.get(key).add(record);
+                    }
+                }
+                for (Map.Entry<String,ArrayList<Record>> entry:peopleResult.entrySet()){
+                    System.out.println(entry.getKey()+": 的信息");
+                    for (Record record:entry.getValue()){
+                        printRecord(record);
+                    }
+                }
+                break;
+            case 2:
+                for (Record record:result){
+                    printRecord(record);
+                }
+                break;
+            default:
+                throw new NumberFormatException();
+        }
+        return false;
     }
 
     public static void main(String[] args) {

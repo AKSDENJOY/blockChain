@@ -12,6 +12,7 @@ import java.util.Date;
 import static joy.aksd.data.dataInfo.PORT;
 import static joy.aksd.data.dataInfo.ROOTIP;
 import static joy.aksd.data.protocolInfo.SELFQUERY;
+import static joy.aksd.tools.readAndPrintData.printRecord;
 import static joy.aksd.tools.toByte.hexStringToByteArray;
 import static joy.aksd.tools.toInt.byteToInt;
 
@@ -52,10 +53,7 @@ public class querySelfRecord {
                 tem = new byte[byteToInt(tem)];
                 in.read(tem);
                 Record record=new Record(tem);
-                System.out.print(record);
-                long time=(long)byteToInt(record.getTime());
-                System.out.println("   time : "+new SimpleDateFormat("YYYY-MM-dd-EEEE HH:mm:ss").format(new Date(time*1000)));
-
+                printRecord(record);
             }
         }catch (Exception e){
             ;
