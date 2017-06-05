@@ -1,10 +1,9 @@
 package joy.aksd.coreThread;
 
-import ECC.ECC;
+import joy.aksd.ECC.ECC;
 import joy.aksd.data.Record;
 import sun.security.ec.ECPrivateKeyImpl;
 import sun.security.ec.ECPublicKeyImpl;
-import sun.security.util.ECUtil;
 
 import java.io.*;
 import java.math.BigInteger;

@@ -1,9 +1,9 @@
 package joy.aksd.listenAndVerifyThread;
 
+import joy.aksd.ECC.ECC;
 import joy.aksd.data.Block;
 import joy.aksd.data.Record;
 import sun.security.ec.ECPublicKeyImpl;
-import sun.security.util.ECUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -363,7 +363,7 @@ class handleThread implements Runnable {
         temHash= digest.digest(tem);
         boolean result=false;
         try {
-            ECPublicKeyImpl publicKey = new ECPublicKeyImpl(new ECPoint(new BigInteger(1, x), new BigInteger(1, y)), ECUtil.getECParameterSpec(null, ECNAME));
+            ECPublicKeyImpl publicKey = new ECPublicKeyImpl(new ECPoint(new BigInteger(1, x), new BigInteger(1, y)), ECC.spec);
             Signature s = Signature.getInstance("SHA1withECDSA", "SunEC");
             s.initVerify(publicKey);
             s.update(temHash);

@@ -1,8 +1,7 @@
-package ECC;
+package joy.aksd.ECC;
 
 import sun.security.ec.ECPrivateKeyImpl;
 import sun.security.ec.ECPublicKeyImpl;
-import sun.security.util.ECUtil;
 
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
