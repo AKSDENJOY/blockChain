@@ -9,8 +9,7 @@ import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECPoint;
+import java.security.spec.*;
 
 import static joy.aksd.data.dataInfo.ECNAME;
 import static joy.aksd.tools.toByte.hexStringToByteArray;
@@ -19,6 +18,22 @@ import static joy.aksd.tools.toByte.hexStringToByteArray;
  * Created by EnjoyD on 2017/4/25.
  */
 public class ECC {
+
+    public static ECParameterSpec spec=initSpec("secp160r2", "1.3.132.0.30", 1, "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73", "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC70", "B4E134D3FB59EB8BAB57274904664D5AF50388BA", "52DCB034293A117E1F4FF11B30F7199D3144CE6D", "FEAFFEF2E331F296E071FA0DF9982CFEA7D43F2E", "0100000000000000000000351EE786A818F3A1A16B", 1);
+
+    private static ECParameterSpec initSpec(String var0, String var1, int var2, String var3, String var4, String var5, String var6, String var7, String var8, int var9) {
+        BigInteger var11 = bi(var3);
+        Object var12;
+        var12 = new ECFieldFp(var11);
+        EllipticCurve var13 = new EllipticCurve((ECField)var12, bi(var4), bi(var5));
+        ECPoint var14 = new ECPoint(bi(var6), bi(var7));
+        return new ECParameterSpec(var13,var14,bi(var8),var9);
+    }
+    private static BigInteger bi(String var0) {
+        return new BigInteger(var0, 16);
+    }
+
+
     public static void main(String[] args) throws Exception {
         KeyPairGenerator kpg;
         kpg=KeyPairGenerator.getInstance("EC","SunEC");
@@ -30,9 +45,9 @@ public class ECC {
         ECPrivateKeyImpl priKey= (ECPrivateKeyImpl) keyPair.getPrivate();
         ECPublicKeyImpl pubKey= (ECPublicKeyImpl) keyPair.getPublic();
 
-        ECPrivateKeyImpl ecPrivateKey=new ECPrivateKeyImpl(priKey.getS(), ECUtil.getECParameterSpec(null, ECNAME));
+        ECPrivateKeyImpl ecPrivateKey=new ECPrivateKeyImpl(priKey.getS(), ECC.spec);
         System.out.println(ecPrivateKey.equals(priKey));
-        ECPublicKeyImpl ecPublicKey=new ECPublicKeyImpl(new ECPoint(pubKey.getW().getAffineX(),pubKey.getW().getAffineY()),ECUtil.getECParameterSpec(null,ECNAME));
+        ECPublicKeyImpl ecPublicKey=new ECPublicKeyImpl(new ECPoint(pubKey.getW().getAffineX(),pubKey.getW().getAffineY()),ECC.spec);
         System.out.println(ecPublicKey.equals(pubKey));
 
         String tems=String.format("%040x",priKey.getS());

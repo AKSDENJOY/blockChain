@@ -1,5 +1,6 @@
 package joy.aksd.coreThread;
 
+import ECC.ECC;
 import joy.aksd.data.Record;
 import sun.security.ec.ECPrivateKeyImpl;
 import sun.security.ec.ECPublicKeyImpl;
@@ -198,8 +199,8 @@ public class CreatRecord {
         String third = in.readUTF();
         System.out.println(first);
         in.close();
-        ECPrivateKeyImpl privateKey = new ECPrivateKeyImpl(new BigInteger(first, 16), ECUtil.getECParameterSpec(null, ECNAME));
-        ECPublicKeyImpl publicKey = new ECPublicKeyImpl(new ECPoint(new BigInteger(second, 16), new BigInteger(third, 16)), ECUtil.getECParameterSpec(null, ECNAME));
+        ECPrivateKeyImpl privateKey = new ECPrivateKeyImpl(new BigInteger(first, 16),ECC.spec);
+        ECPublicKeyImpl publicKey = new ECPublicKeyImpl(new ECPoint(new BigInteger(second, 16), new BigInteger(third, 16)), ECC.spec);
         KeyPair keyPair = new KeyPair(publicKey, privateKey);
         return keyPair;
     }
