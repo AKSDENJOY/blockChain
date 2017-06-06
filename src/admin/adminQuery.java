@@ -2,9 +2,7 @@ package admin;
 
 import joy.aksd.data.Record;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -20,7 +18,14 @@ import static joy.aksd.tools.toString.byteToString;
  * Created by EnjoyD on 2017/5/25.
  */
 public class adminQuery {
+    private HashMap<String,String> lockSriptToName=new HashMap<>();
+
     public void start(){
+        try {
+            initName();
+        } catch (IOException e) {
+            System.out.println("init error");
+        }
         Socket socket= null;
         ArrayList<Record> result=new ArrayList<>();
         try {
@@ -58,29 +63,33 @@ public class adminQuery {
         startClassifySearch(result);
     }
 
-    private void startClassifySearch(ArrayList<Record> result) {
+    private void printItems(){
+        System.out.println("======================");
         System.out.println(" 1 按人查询");
         System.out.println(" 2 按时间由后向前查询");
         System.out.println(" 0 结束");
+        System.out.println("======================");
+    }
+
+    private void startClassifySearch(ArrayList<Record> result) {
+        printItems();
         Scanner sc=new Scanner(System.in);
         while (sc.hasNext()){
             String input=sc.nextLine();
             if (input.length()!=1){
                 System.out.println("illegal input,please retry");
-                continue;
+
             }
             else {
                 try {
                     int i=Integer.parseInt(input);
                     if (dealClassifySearch(i,result))
                         return;
-                    else
-                        continue;
                 }catch (NumberFormatException e){
                     System.out.println("illegal input,please retry");
-                    continue;
                 }
             }
+            printItems();
         }
     }
 
@@ -104,7 +113,12 @@ public class adminQuery {
                     }
                 }
                 for (Map.Entry<String,ArrayList<Record>> entry:peopleResult.entrySet()){
-                    System.out.println(entry.getKey()+": 的信息");
+                    String lockSript=entry.getKey();
+                    String name=lockSript;
+                    if (lockSriptToName.containsKey(lockSript)){
+                        name=lockSriptToName.get(lockSript);
+                    }
+                    System.out.println(name+": 的信息");
                     for (Record record:entry.getValue()){
                         printRecord(record);
                     }
@@ -119,6 +133,19 @@ public class adminQuery {
                 throw new NumberFormatException();
         }
         return false;
+    }
+
+    private void initName() throws IOException {
+        DataInputStream in=new DataInputStream(new FileInputStream("./adminName"));
+        while (true){
+            try {
+                String lockScript=in.readUTF();
+                String name=in.readUTF();
+                this.lockSriptToName.put(lockScript,name);
+            }catch (Exception e){
+                break;
+            }
+        }
     }
 
     public static void main(String[] args) {

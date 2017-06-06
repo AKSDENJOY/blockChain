@@ -9,11 +9,14 @@ import java.io.*;
 import java.net.Socket;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
+import java.util.Scanner;
 
 import static joy.aksd.data.dataInfo.ECNAME;
 import static joy.aksd.data.dataInfo.PORT;
 import static joy.aksd.data.dataInfo.ROOTIP;
 import static joy.aksd.data.protocolInfo.REGISTER;
+import static joy.aksd.tools.toByte.hexStringToByteArray;
+import static joy.aksd.tools.toString.byteToString;
 
 /**
  * Created by EnjoyD on 2017/5/3.
@@ -47,7 +50,27 @@ public class registUser {
         out.write(REGISTER);
         out.write(record.getBytesData());
         out.close();
-        System.out.println("regist over");
+        System.out.println("regist phrase1 over");
 
+        System.out.println("please enter the name!");
+        Scanner sc=new Scanner(System.in);
+        String name=sc.nextLine();
+        sc.close();
+
+        //save copyOFLockSrcipt
+        file=new DataOutputStream(new FileOutputStream("./adminName",true));
+        file.writeUTF(byteToString(getLockScript(pubKey)));
+        file.writeUTF(name);
+        file.close();
+        System.out.println("regist phrase2 over");
+
+    }
+    private static byte[] getLockScript(ECPublicKeyImpl publicKey) throws NoSuchAlgorithmException {
+        byte[] x = hexStringToByteArray(String.format("%040x", publicKey.getW().getAffineX()));
+        byte[] y = hexStringToByteArray(String.format("%040x", publicKey.getW().getAffineY()));
+        byte[] result = new byte[x.length + y.length];
+        System.arraycopy(x, 0, result, 0, x.length);
+        System.arraycopy(y, 0, result, x.length, y.length);
+        return MessageDigest.getInstance("SHA-256").digest(result);
     }
 }
