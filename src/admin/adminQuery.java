@@ -122,6 +122,7 @@ public class adminQuery {
                     for (Record record:entry.getValue()){
                         printRecord(record);
                     }
+                    System.out.println("-------------------------------------");
                 }
                 break;
             case 2:

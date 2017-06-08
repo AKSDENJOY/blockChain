@@ -51,7 +51,7 @@ public class Main2 {
             recoverFromDisk();
         } catch (IOException e) {
             System.out.println("error in recover");
-            return;
+//            return;
         }
         //监听线程启动
         new Listener().start();
