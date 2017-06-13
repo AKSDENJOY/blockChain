@@ -111,7 +111,7 @@ class handleThread implements Runnable {
                     this.socket.close();
                     break;
                 case 0x03://查询顺序戳
-                    sendOrderStamp(in,out);
+                    sendOrderStampAndTime(in,out);
                     this.socket.close();
                     break;
                 case 0x0f://测试链接
@@ -290,7 +290,7 @@ class handleThread implements Runnable {
         //再查硬盘 不查了 太耗性能
     }
 
-    private void sendOrderStamp(DataInputStream in, DataOutputStream out) throws IOException {
+    private void sendOrderStampAndTime(DataInputStream in, DataOutputStream out) throws IOException {
         byte [] receive=new byte[32];
         in.read(receive);
         String key=byteToString(receive);
@@ -299,6 +299,7 @@ class handleThread implements Runnable {
         }
         Record record=verifyRecord2.get(key);
         out.write(record.getOrderStamp());
+        out.write(intToByte(getUnixTime()));
 
     }
 

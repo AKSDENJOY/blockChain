@@ -53,8 +53,8 @@ public class dataInfo {
      *  exceptTime 目标时间，期望平均多长时间产生一个区块，proof of work中为定值。
      *  errorTime 时间误差，误差范围内时间不变
      */
-    public static final int exceptTime=60;//单位：秒
-    public static final int errorTime=10;//单位：秒
+    public static final int exceptTime=1920;//单位：秒
+    public static final int errorTime=320;//单位：秒
     /**
      * 区块存储位置
      */

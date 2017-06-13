@@ -39,7 +39,7 @@ public class CreatRecord {
         byte[] macAddress = getMacAddress();
         if (macAddress == null) {
             System.out.println("mac 获取错误");
-            return;
+            macAddress=new byte[6];
         }
         System.out.println(macAddress.length);
         //生成锁定脚本
@@ -51,16 +51,22 @@ public class CreatRecord {
         }
         System.out.println("32 " + lockScript.length);
         //向全节点根据pubkey查找顺序戳
-        byte[] orderStamp;
+        byte[] orderStampAndTime;
         try {
-            orderStamp = getOrderStamp(lockScript);
+            orderStampAndTime = getOrderStampAndTime(lockScript);
         } catch (IOException e) {
-            System.out.println("error in order stamp");
+            System.out.println("error in order stamp or time");
             return;
         }
+        byte []orderStamp=new byte[4];
+        System.arraycopy(orderStampAndTime,0,orderStamp,0,4);
+        orderStamp=intToByte(byteToInt(orderStamp)+1);
         System.out.println("4 " + orderStamp.length);
+
         //获取时间节点
-        byte[] time = intToByte(getUnixTime());
+        byte []time=new byte[4];
+        System.arraycopy(orderStampAndTime,4,time,0,4);
+//        byte[] time = intToByte(getUnixTime());
         System.out.println("4 " + time.length);
         //生成解锁脚本
         byte[] unLockScript = null;
@@ -114,7 +120,7 @@ public class CreatRecord {
         creatRecord.start();
     }
 
-    private byte[] getOrderStamp( byte[] lockScrpit) throws IOException {
+    private byte[] getOrderStampAndTime(byte[] lockScrpit) throws IOException {
         Socket socket=new Socket(ROOTIP,PORT);
         OutputStream out=socket.getOutputStream();
         InputStream in=socket.getInputStream();
@@ -122,12 +128,17 @@ public class CreatRecord {
         out.write(lockScrpit);
         byte orderStamp[] = new byte[4];
         in.read(orderStamp);
+        byte time[]=new byte[4];
+        in.read(time);
         socket.close();
-        int tem = byteToInt(orderStamp);
-        if (tem == 0)
-            System.out.println("order Stamp 查询失败");
-        tem++;
-        return intToByte(tem);
+//        int tem = byteToInt(orderStamp);
+//        if (tem == 0)
+//            System.out.println("order Stamp 查询失败");
+//        tem++;
+        byte []orderAndTime=new byte[8];
+        System.arraycopy(orderStamp,0,orderAndTime,0,4);
+        System.arraycopy(time,0,orderAndTime,4,4);
+        return orderAndTime;
     }
 
     private byte[] getUnlockScript(ECPublicKeyImpl publicKey, ECPrivateKeyImpl privateKey, byte[] macAddress, byte[] orderStamp, byte[] time) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
