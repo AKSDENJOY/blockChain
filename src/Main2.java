@@ -58,6 +58,8 @@ public class Main2 {
         //验证线程启动
         new verifyThread().start();
 
+        startSyncBlock();
+
         try {
             creatFirstBlock.start();
         } catch (NoSuchAlgorithmException e) {
@@ -87,6 +89,22 @@ public class Main2 {
         //endregion
     }
 
+    private static void startSyncBlock() {
+        if (blocks.size()==0){//硬盘中没有
+            //从其他节点下载区块后恢复
+        }
+        else {
+            //检查当前区块是否正确，错误则删除全部区块，重新下载，正确则从当前区块开始下载
+        }
+        //区块下载完毕重新进行区块恢复
+        try {
+            recoverFromDisk();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
 
     public static void recoverFromDisk() throws IOException {

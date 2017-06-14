@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 
@@ -84,6 +85,8 @@ public class dataInfo {
 
     public static String ROOTIP="";
     public static final String IPLOCATION="ip.txt";
+
+    public static ArrayList<String> IPList=new ArrayList<>();
     static {
         try {
             setIP();
@@ -95,11 +98,25 @@ public class dataInfo {
     private static void setIP() throws IOException {
         BufferedReader reader=new BufferedReader(new FileReader(IPLOCATION));
         String IP=reader.readLine();
+        ArrayList<String> ipList=new ArrayList<>();
+        while (true){
+            String temIP=reader.readLine();
+            if (temIP==null)
+                break;
+            ipList.add(temIP);
+        }
         reader.close();
         if (checkIP(IP))
             ROOTIP=IP;
         else
             throw new IOException();
+        Iterator<String> it=ipList.iterator();
+        while (it.hasNext()){
+            String temIP=it.next();
+            if (!checkIP(temIP))
+                it.remove();
+        }
+        IPList=ipList;
     }
 
     public static boolean checkIP(String ip) {
