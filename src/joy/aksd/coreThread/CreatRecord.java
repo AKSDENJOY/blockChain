@@ -170,23 +170,24 @@ public class CreatRecord {
     }
 
     private byte[] getMacAddress() {
-        InetAddress ia = null;
+        InetAddress ia;
         try {
             ia = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            System.out.println("network error");
+            return null;
         }
         byte mac[] = null;
         try {
             mac = NetworkInterface.getByInetAddress(ia).getHardwareAddress();
-        } catch (SocketException e) {
-            e.printStackTrace();
+        } catch (SocketException | NullPointerException e) {
+            System.out.println("net is wrong or maybe is Linux operation system");
         }
         if (mac != null) {
             return mac;
         }
 
-        Enumeration<NetworkInterface> ni = null;
+        Enumeration<NetworkInterface> ni;
         try {
             ni = NetworkInterface.getNetworkInterfaces();
             while (ni.hasMoreElements()) {
