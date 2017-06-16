@@ -12,6 +12,14 @@ public class toByte {
         return result;
     }
 
+    public static byte[]longToByte(long i){
+        byte []result=new byte[8];
+        for (int j=0;j<8;j++){
+            result[j]= (byte) ((i>>(8*(7-j)))&0xff);
+        }
+        return result;
+    }
+
     public static byte intToOneByte(int i){
         return (byte) (i&0xff);
     }
@@ -25,4 +33,5 @@ public class toByte {
         return result;
 
     }
+
 }

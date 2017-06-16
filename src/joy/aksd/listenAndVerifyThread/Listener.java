@@ -5,13 +5,11 @@ import joy.aksd.data.Block;
 import joy.aksd.data.Record;
 import sun.security.ec.ECPublicKeyImpl;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.ECPoint;
 import java.util.*;
@@ -20,6 +18,7 @@ import static joy.aksd.data.dataInfo.*;
 import static joy.aksd.data.protocolInfo.*;
 import static joy.aksd.tools.toByte.intToByte;
 import static joy.aksd.tools.toInt.byteToInt;
+import static joy.aksd.tools.toLong.byteToLong;
 import static joy.aksd.tools.toString.byteToString;
 
 /** 监听线程
@@ -128,6 +127,10 @@ class handleThread implements Runnable {
                     System.out.println("admin query");
                     startAdminQuery(in,out);
                     break;
+                case DOWNLOADBLOCK:
+                    System.out.println("receive down request");
+                    startTransfer(in,out);
+                    break;
                 default:
                     break;
             }
@@ -143,6 +146,24 @@ class handleThread implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void startTransfer(DataInputStream in, DataOutputStream out) throws IOException {
+        RandomAccessFile file=null;
+        try {
+            byte []lens=new byte[8];
+            in.read(lens);
+            file=new RandomAccessFile(location,"r");
+            file.seek(byteToLong(lens));
+            int i=0;
+            byte []buff=new byte[1024];
+            while ((i=file.read(buff))!=-1){
+                out.write(buff,0,i);
+            }
+        }
+        finally{
+            file.close();
         }
     }
 
