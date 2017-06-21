@@ -140,8 +140,10 @@ public class adminQuery {
         DataInputStream in=new DataInputStream(new FileInputStream("./adminName"));
         while (true){
             try {
-                String lockScript=in.readUTF();
-                String name=in.readUTF();
+                String lockScript=in.readLine();//windows下可以正常使用，linux下未知
+                String name=in.readLine();
+                if (lockScript==null)
+                    break;
                 this.lockSriptToName.put(lockScript,name);
             }catch (Exception e){
                 break;
