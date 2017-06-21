@@ -59,8 +59,8 @@ public class registUser {
 
         //save copyOFLockSrcipt
         file=new DataOutputStream(new FileOutputStream("./adminName",true));
-        file.writeUTF(byteToString(getLockScript(pubKey)));
-        file.writeUTF(name);
+        file.writeUTF(byteToString(getLockScript(pubKey))+"\n");//windows 下的换行符，如果在linux下可能需要改变
+        file.writeUTF(name+"\n");
         file.close();
         System.out.println("regist phrase2 over");
 
