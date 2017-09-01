@@ -1,7 +1,5 @@
 package joy.aksd.listenAndVerifyThread;
 
-import javafx.scene.shape.VLineTo;
-import jdk.nashorn.internal.ir.IfNode;
 import joy.aksd.ECC.ECC;
 import joy.aksd.coreThread.WriteBlock;
 import joy.aksd.data.Block;
@@ -12,7 +10,6 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.ECPoint;
 import java.util.*;
