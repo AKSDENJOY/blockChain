@@ -38,7 +38,12 @@ public class coreProcess implements Runnable{
             }
             //广播区块
             BroadcastBlock broadcastBlock = new BroadcastBlock(block);
-            broadcastBlock.start();
+            try {
+                broadcastBlock.start();
+
+            }catch (Exception e){
+                System.out.println("broadcast error ");
+            }
             //写链中区块入硬盘
             WriteBlock writeBlock = new WriteBlock(block);
             try {

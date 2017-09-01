@@ -158,9 +158,9 @@ class handleThread implements Runnable {
         System.out.println("reveive getip message ");
         String ip=socket.getRemoteSocketAddress().toString().split(":")[0];
         ip=ip.substring(1);
-        HashSet<String> tem;
+        HashSet<String> tem=new HashSet<>();
         synchronized (IPList) {
-            tem = (HashSet<String>) IPList.clone();
+            tem.addAll(IPList);
         }
         ObjectOutputStream o=new ObjectOutputStream(out);
         o.writeObject(tem);
@@ -169,7 +169,7 @@ class handleThread implements Runnable {
     }
 
     private void startReceiveBlockProcess(DataInputStream in, DataOutputStream out) throws IOException {
-        byte []receive=new byte[4];
+        byte []receive=new byte[2];
         System.out.println("receive a block,start process");
         try {
             in.read(receive);//读入区块长度

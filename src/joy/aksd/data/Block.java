@@ -109,6 +109,10 @@ public class Block implements Serializable{
         this.blockNumber = result;
     }
 
+    /**
+     * 获取头部长度
+     * @return 头部长度
+     */
     public int getBlockByteNum(){
         return 32+32+4+4+1;
     }
@@ -141,6 +145,10 @@ public class Block implements Serializable{
         this.recordCount = result;
     }
 
+    /**
+     * 获取整个block 字节数组
+     * @return  block字节数组 读取时先读取前两字节得到整个区块长度，然后再读取剩余字节用构造函数生成区块
+     */
     public byte[] getBlockDatas(){
         int i=lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length+data.length;
         byte result[]=new byte[2+i];

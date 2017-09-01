@@ -114,7 +114,7 @@ public class Main2 {
         ObjectInputStream inputStream=new ObjectInputStream(in);
 
         HashSet<String> tem= (HashSet<String>) inputStream.readObject();
-        IPList=tem;
+        IPList.addAll(tem);
 
     }
 

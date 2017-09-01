@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static joy.aksd.data.dataInfo.*;
+import static joy.aksd.data.protocolInfo.RECEIVEBLOCK;
 import static joy.aksd.tools.toByte.intToByte;
 
 /**
@@ -29,6 +30,7 @@ public class BroadcastBlock {
     }
 
     private void broadcast() {
+        System.out.println("broadcast IPlist size"+IPList.size());
         for(String ip:IPList) {
             broadCastThread.execute(new broadCastThread(ip, this.block));
         }
@@ -47,11 +49,14 @@ class broadCastThread implements Runnable{
     public void run() {
         try {
             Socket socket = new Socket(ip, PORT);
+            System.out.println("broadcast to"+ip);
+
 
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
+            out.write(RECEIVEBLOCK);
 
-            out.write(intToByte(block.getBlockDatas().length));
+//            out.write(intToByte(block.getBlockDatas().length));
 
             out.write(block.getBlockDatas());
 
@@ -60,7 +65,10 @@ class broadCastThread implements Runnable{
 
             if (tag[0] == 0x00) {//同步区块
                 LinkedList<Block> copyBlock = new LinkedList<>();
-                Collections.copy(copyBlock, blocks);
+                synchronized (blocks){
+                    copyBlock.addAll(blocks);
+                }
+//                Collections.copy(copyBlock, blocks);
                 if (copyBlock.size() >= 200) {
                     out.write(intToByte(200));
                 } else {
@@ -85,6 +93,7 @@ class broadCastThread implements Runnable{
                 objectOutputStream.writeObject(unPackageRecord);
             }
         }catch (Exception e){
+            e.printStackTrace();
             synchronized (IPList){
                 IPList.remove(ip);
             }
