@@ -6,10 +6,13 @@ import joy.aksd.listenAndVerifyThread.Listener;
 import joy.aksd.listenAndVerifyThread.verifyThread;
 
 import java.io.*;
+import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
 
 import static joy.aksd.data.dataInfo.*;
+import static joy.aksd.data.protocolInfo.GETIPLIST;
 import static joy.aksd.tools.toInt.byteToInt;
 import static joy.aksd.tools.toString.byteToString;
 
@@ -62,11 +65,23 @@ public class Main2 {
 
         try {
             creatFirstBlock.start();
+
         } catch (NoSuchAlgorithmException e) {
             System.out.println("error on first");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        try {
+            System.out.println("get IPList");
+            getIPist();
+        } catch (IOException e) {
+            System.out.println("error in get IPList");
+            System.exit(1);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         //核心线程启动
         coreWork.execute(new coreProcess());
 
@@ -89,6 +104,20 @@ public class Main2 {
         //endregion
     }
 
+    private static void getIPist() throws IOException, ClassNotFoundException {
+        Socket socket=new Socket(ROOTIP,PORT);
+        OutputStream out=socket.getOutputStream();
+        InputStream in=socket.getInputStream();
+
+        out.write(GETIPLIST);
+
+        ObjectInputStream inputStream=new ObjectInputStream(in);
+
+        HashSet<String> tem= (HashSet<String>) inputStream.readObject();
+        IPList=tem;
+
+    }
+
     private static void startSyncBlock() {
         if (blocks.size()==0){//硬盘中没有
             //从其他节点下载区块后恢复
@@ -97,7 +126,6 @@ public class Main2 {
             //检查当前区块是否正确，错误则删除全部区块，重新下载，正确则从当前区块开始下载
             if (true)//检查成功
                 return;
-
         }
         //区块下载完毕重新进行区块恢复
         try {

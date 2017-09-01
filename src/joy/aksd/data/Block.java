@@ -1,12 +1,14 @@
 package joy.aksd.data;
 
+import java.io.Serializable;
+
 import static joy.aksd.tools.toByte.intToByte;
 import static joy.aksd.tools.toInt.byteToInt;
 
 /**
  * Created by EnjoyD on 2017/4/18.
  */
-public class Block {
+public class Block implements Serializable{
     private byte lastHash[];//32 bytes
     private byte Merkle[];// 32 bytes
     private byte time[];//4bytes

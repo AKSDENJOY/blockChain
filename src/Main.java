@@ -1,66 +1,52 @@
+import joy.aksd.data.Block;
+import joy.aksd.data.Record;
+
 import java.io.*;
 import java.security.*;
+
+import static joy.aksd.data.dataInfo.*;
+import static joy.aksd.tools.toInt.byteToInt;
 
 /**
  * Created by EnjoyD on 2017/4/27.
  */
 public class Main {
     public static void main(String[] args) throws IOException, InvalidKeyException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
-//        RandomAccessFile randomAccessFile=new RandomAccessFile(location, "r");
-//        long location=0;
-//        while (randomAccessFile.getFilePointer()!=randomAccessFile.length()){
-//            byte []count=new byte[2];
-//            randomAccessFile.read(count);
-//            count=new byte[byteToInt(count)];
-//            randomAccessFile.read(count);
-//            Block block=new Block(count);
-//            System.out.println(block);
-//        }
-//        randomAccessFile.close();
-//        recoverFromDisk();
+
+        recoverFromDisk();
     }
     //region recoverFromDisktest
-//    public static void recoverFromDisk() throws IOException {
-//        DataInputStream in=new DataInputStream(new FileInputStream(location));
-//        long index=0;
-//        byte tem[];
-//        while (true){
-//            //读取区块
-//            tem=new byte[2];
-//            in.read(tem);
-//            int byteCount=byteToInt(tem);
-//            if (byteCount==0)
-//                break;
-//            //建立索引
-//            indexBlock.add(index);
-//            tem=new byte[byteCount];
-//            in.read(tem);
-//            index+=(2+tem.length);
-//            //复原区块
-//            Block block=new Block(tem);
-//            //添加区块缓存
-//            blocks.addLast(block);
-//            //添加time
-//            if (timeRecord.size()==adjustCount)
-//                timeRecord.clear();
-//            timeRecord.add(byteToInt(block.getTime()));
-//            //读取纪录
-//            byte blockData[]=block.getData();
-//            int x=0;
-//            for (int i=0;i<byteToInt(block.getRecordCount());i++){
-//                tem=new byte[2];
-//                System.arraycopy(blockData,x,tem,0,2);
-//                x+=2;
-//                tem=new byte[byteToInt(tem)];
-//                System.arraycopy(blockData,x,tem,0,tem.length);
-//                x+=tem.length;
-//                Record record=new Record(tem);
-//                //添加未使用纪录
-//                verifyRecord2.put(byteToString(record.getLockScript()),record);
-//            }
-//        }
-//        in.close();
-//        System.out.println("end");
-//    }
+    public static void recoverFromDisk() throws IOException {
+        DataInputStream in=new DataInputStream(new FileInputStream(location));
+        byte tem[];
+        while (true){
+            //读取区块
+            tem=new byte[2];
+            in.read(tem);
+            int byteCount=byteToInt(tem);
+            if (byteCount==0)
+                break;
+            //复原区块
+            tem=new byte[byteCount];
+            in.read(tem);
+            Block block=new Block(tem);
+//            System.out.println(block);
+            //读取纪录
+            byte blockData[]=block.getData();
+            int x=0;
+            for (int i=0;i<byteToInt(block.getRecordCount());i++){
+                tem=new byte[2];
+                System.arraycopy(blockData,x,tem,0,2);
+                x+=2;
+                tem=new byte[byteToInt(tem)];
+                System.arraycopy(blockData,x,tem,0,tem.length);
+                x+=tem.length;
+                Record record=new Record(tem);
+                System.out.println(record);
+            }
+        }
+        in.close();
+        System.out.println("end");
+    }
     //endregion
 }

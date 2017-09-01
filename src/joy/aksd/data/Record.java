@@ -1,5 +1,7 @@
 package joy.aksd.data;
 
+import java.io.Serializable;
+
 import static joy.aksd.tools.toByte.intToByte;
 import static joy.aksd.tools.toInt.byteToInt;
 import static joy.aksd.tools.toString.byteToString;
@@ -7,7 +9,7 @@ import static joy.aksd.tools.toString.byteToString;
 /**
  * Created by EnjoyD on 2017/4/18.
  */
-public class Record {
+public class Record implements Serializable{
     private byte []mac;//6字节
     private byte []orderStamp;//4字节
     private byte []time;//4

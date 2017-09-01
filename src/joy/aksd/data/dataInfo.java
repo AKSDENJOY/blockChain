@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.*;
@@ -21,21 +22,25 @@ public class dataInfo {
      */
     public static final LinkedList<Block> blocks= new LinkedList<>();
     /**
+     * 备用链
+     */
+    public static ArrayList<ArrayList<Block>> backUpChain=new ArrayList<>();
+    /**
      * 验证完脚本后的纪录池
      */
     public static LinkedBlockingQueue<Record> verifyRecord1 = new LinkedBlockingQueue<>();
     /**
-     * 验证完时间与顺序戳后的未使用纪录池
+     * 验证完时间与顺序戳后的未使用纪录池，类似于 未使用的UTXO
      */
     public static ConcurrentHashMap<String,Record> verifyRecord2=new ConcurrentHashMap<>();
     /**
      * 验证完成后的记录池，用以创建默克尔树。
      */
-    public static final ArrayList<Record> identifedRecord=new ArrayList<>();
+    public static ArrayList<Record> identifedRecord=new ArrayList<>();
     /**
      * 打包生成区块时保存的记录
      */
-    public static final ArrayList<Record> unPackageRecord=new ArrayList<>();
+    public static ArrayList<Record> unPackageRecord=new ArrayList<>();
 
     /**
      * timeRecord  时间纪录，用以存储adjustCount个区块时间
@@ -86,7 +91,7 @@ public class dataInfo {
     public static String ROOTIP="";
     public static final String IPLOCATION="ip.txt";
 
-    public static ArrayList<String> IPList=new ArrayList<>();
+    public static HashSet<String> IPList= new HashSet<>();
     static {
         try {
             setIP();
@@ -116,7 +121,7 @@ public class dataInfo {
             if (!checkIP(temIP))
                 it.remove();
         }
-        IPList=ipList;
+        IPList.addAll(ipList);
     }
 
     public static boolean checkIP(String ip) {

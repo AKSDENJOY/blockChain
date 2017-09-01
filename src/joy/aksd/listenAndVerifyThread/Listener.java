@@ -1,6 +1,9 @@
 package joy.aksd.listenAndVerifyThread;
 
+import javafx.scene.shape.VLineTo;
+import jdk.nashorn.internal.ir.IfNode;
 import joy.aksd.ECC.ECC;
+import joy.aksd.coreThread.WriteBlock;
 import joy.aksd.data.Block;
 import joy.aksd.data.Record;
 import sun.security.ec.ECPublicKeyImpl;
@@ -13,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.ECPoint;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static joy.aksd.data.dataInfo.*;
 import static joy.aksd.data.protocolInfo.*;
@@ -122,6 +126,7 @@ class handleThread implements Runnable {
                     break;
                 case RECEIVEBLOCK:
                     System.out.println("receive block");
+                    startReceiveBlockProcess(in,out);
                     break;
                 case ADMINQUERY:
                     System.out.println("admin query");
@@ -129,8 +134,11 @@ class handleThread implements Runnable {
                     break;
                 case DOWNLOADBLOCK:
                     System.out.println("receive down request");
+
                     startTransfer(in,out);
                     break;
+                case GETIPLIST:
+                    addTofriend(in,out,this.socket);
                 default:
                     break;
             }
@@ -146,6 +154,244 @@ class handleThread implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void addTofriend(DataInputStream in, DataOutputStream out, Socket socket) throws IOException {
+        System.out.println("reveive getip message ");
+        String ip=socket.getRemoteSocketAddress().toString().split(":")[0];
+        ip=ip.substring(1);
+        HashSet<String> tem;
+        synchronized (IPList) {
+            tem = (HashSet<String>) IPList.clone();
+        }
+        ObjectOutputStream o=new ObjectOutputStream(out);
+        o.writeObject(tem);
+        IPList.add(ip);
+        System.out.println("receive a connection now ipList size is:"+IPList.size());
+    }
+
+    private void startReceiveBlockProcess(DataInputStream in, DataOutputStream out) throws IOException {
+        byte []receive=new byte[4];
+        System.out.println("receive a block,start process");
+        try {
+            in.read(receive);//读入区块长度
+            receive=new byte[byteToInt(receive)];
+            in.read(receive);//读入区块字节
+        } catch (IOException e) {
+            return;
+        }
+        Block receivedBlock=new Block(receive);
+        if (byteToInt(receivedBlock.getBlockNumber())>byteToInt(blocks.getLast().getBlockNumber())+1){
+            interuptCoreThread();
+            System.out.println("receive a higher block,interrupt core process");
+//            if (backUpChainIsAvailable(receivedBlock)){
+//                useBack(receivedBlock);//替换blocks
+//            }else {
+//                SycnFromOthers(in,out);//同步最近200块，不够200则全同步
+//            }
+            try {
+                out.write(0x00);
+                SycnFromOthers(in,out);//同步最近200块，不够200则全同步
+            } catch (IOException e) {
+                System.err.println("error in sync first connection");
+            }
+
+//            backUpChainClear();
+            reStartCoreThread();
+            System.out.println("restart core process");
+        }
+        if (byteToInt(receivedBlock.getBlockNumber())==byteToInt(blocks.getLast().getBlockNumber())+1){
+            Block last=blocks.getLast();
+            if (Arrays.equals(receivedBlock.getLastHash(),getLastHash(last))){
+                out.write(0x01);
+                interuptCoreThread();
+                System.out.println("receive a expect block interrupt");
+
+                synchronized (blocks) {
+                    blocks.add(receivedBlock);
+                    timeRecord.add(byteToInt(receivedBlock.getTime()));
+                    System.out.println("update blocks and timerecord");
+                }
+                try {
+                    updatefewData(in);
+                }catch (Exception e) {
+                    System.err.println("error in updatefewdata");
+                    ArrayList<Record> tem=new ArrayList<>();
+                    tem.addAll(unPackageRecord);
+                    tem.addAll(identifedRecord);
+                    unPackageRecord.clear();
+                    identifedRecord=tem;
+                }
+                try {
+                    new WriteBlock(receivedBlock).start();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                reStartCoreThread();
+                System.out.println("restart ");
+            }
+        }
+    }
+
+    private void updatefewData(DataInputStream in) throws IOException, ClassNotFoundException {
+        ObjectInputStream objectInputStream=new ObjectInputStream(in);
+        ArrayList<Record> temIdentifedRecord= (ArrayList<Record>) objectInputStream.readObject();
+        ArrayList<Record> temUnPackageRecord= (ArrayList<Record>) objectInputStream.readObject();
+
+        System.out.println("update few data");
+        identifedRecord= temIdentifedRecord;
+        unPackageRecord= temUnPackageRecord;
+        ArrayList<Record> tem=new ArrayList<>();
+        tem.addAll(unPackageRecord);
+        tem.addAll(identifedRecord);
+        unPackageRecord.clear();
+        identifedRecord=tem;
+
+    }
+
+    private void reStartCoreThread() {
+        interuptReset();
+//        timeRecord.add(byteToInt(blocks.getLast().getTime()));
+        coreWork.execute(new joy.aksd.coreThread.coreProcess());
+
+    }
+
+//    private void backUpChainClear() {
+//        backUpChain.clear();
+//    }
+
+    private void updateProgramData(DataInputStream in, DataOutputStream out) throws IOException, ClassNotFoundException {
+        //verifyRecord2   identifedRecord  unPackageRecord indexBlock timeRecord
+        System.out.println("update 200 data");
+
+        ObjectInputStream objectInputStream=new ObjectInputStream(in);
+        ConcurrentHashMap<String, Record> temVerifyRecord2=(ConcurrentHashMap<String, Record>) objectInputStream.readObject();
+        ArrayList<Record> temIdentifedRecord= (ArrayList<Record>) objectInputStream.readObject();
+        ArrayList<Record> temUnPackageRecord= (ArrayList<Record>) objectInputStream.readObject();
+        ArrayList<Long> temIndexBlock= (ArrayList<Long>) objectInputStream.readObject();
+        ArrayList<Integer> temTimeRecord= (ArrayList<Integer>) objectInputStream.readObject();
+
+
+        verifyRecord2= temVerifyRecord2;
+        identifedRecord= temIdentifedRecord;
+        unPackageRecord= temUnPackageRecord;
+        indexBlock= temIndexBlock;
+        timeRecord= temTimeRecord;
+        ArrayList<Record> tem=new ArrayList<>();
+        tem.addAll(unPackageRecord);
+        tem.addAll(identifedRecord);
+        unPackageRecord.clear();
+        identifedRecord=tem;
+
+
+    }
+
+    private void SycnFromOthers(DataInputStream in, DataOutputStream out) throws IOException {
+
+        byte[] count=new byte[4];
+        in.read(count);
+        System.out.println("start sync block 200");
+        int counts=byteToInt(count);
+        ArrayList<Block> receivedBlock=new ArrayList<>();
+        for (int i=0;i<counts;i++){
+            count=new byte[4];
+            in.read(count);
+            count=new byte[byteToInt(count)];
+            in.read(count);
+            Block block=new Block(count);
+            receivedBlock.add(block);
+        }
+        Block firstBlock=receivedBlock.get(0);
+        LinkedList<Block> copyBlock=new LinkedList<>();//备用blocks
+        Collections.copy(copyBlock,blocks);
+        for (int i=0;i<copyBlock.size();i++){
+            if (Arrays.equals(copyBlock.removeLast().getBlockNumber(),firstBlock.getBlockNumber())){
+                break;
+            }
+        }
+        copyBlock.addAll(receivedBlock);
+
+        try {
+            updateProgramData(in,out);
+        } catch (Exception e) {
+            System.err.println("error in sync");
+            return;
+        }
+
+
+        blocks.clear();
+        blocks.addAll(copyBlock);
+
+
+        //rewrite last 200block to hardrive
+        try {
+            reWriteToHardrie(receivedBlock);//重新写received block 块
+
+        }catch (IOException e){
+            System.out.println("error in write to hard-drive");
+        }
+
+    }
+
+    private void reWriteToHardrie(ArrayList<Block> receivedBlock) throws IOException {
+        Block first=receivedBlock.get(0);
+        long cur=indexBlock.get(byteToInt(first.getBlockNumber()));
+        RandomAccessFile f=new RandomAccessFile(location,"rw");
+        f.seek(cur);
+        for (Block b:receivedBlock){
+            f.write(b.getBlockDatas());
+        }
+        f.close();
+    }
+
+//    private void useBack(Block receivedBlock) {
+//        ArrayList<Block> arr=backUpChain.get(0);
+//        LinkedList<Block> copyBlock=new LinkedList<>();
+//        Collections.copy(copyBlock,blocks);
+//        for (int i=0;i<copyBlock.size();i++){
+//            if (byteToInt(copyBlock.getLast().getBlockNumber())==byteToInt(arr.get(0).getBlockNumber())){
+//                copyBlock.removeLast();
+//                break;
+//            }
+//            copyBlock.removeLast();
+//        }
+//        copyBlock.addAll(arr);
+//        copyBlock.add(receivedBlock);
+//        blocks.clear();
+//        blocks.addAll(copyBlock);
+//    }
+
+//    private boolean backUpChainIsAvailable(Block receivedBlock) {//目前仅进行简单判断
+//        for (ArrayList<Block> arr:backUpChain){
+//            if (byteToInt(arr.get(arr.size()-1).getBlockNumber())+1==byteToInt(receivedBlock.getBlockNumber())){
+//                if (Arrays.equals(getLastHash(arr.get(arr.size()-1)),receivedBlock.getLastHash())){
+//                    backUpChain.clear();
+//                    backUpChain.add(arr);
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+
+    private byte[] getLastHash(Block block) {
+        byte[] lashHash=block.getLastHash();
+        byte[] merkle=block.getMerkle();
+        byte[] time=block.getTime();
+        byte difficulty=block.getDifficulty();
+        byte[]nonce=block.getNonce();
+        byte[] tem=new byte[lashHash.length+merkle.length+time.length+1+nonce.length];
+        System.arraycopy(lashHash,0,tem,0,lashHash.length);
+        System.arraycopy(merkle,0,tem,lashHash.length,merkle.length);
+        System.arraycopy(time,0,tem,lashHash.length+merkle.length,time.length);
+        tem[lashHash.length+merkle.length+time.length]=difficulty;
+        System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+time.length+1,nonce.length);
+        try {
+            return MessageDigest.getInstance("SHA-256").digest(tem);
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("error in \n"+e.getStackTrace());
+            return null;
         }
     }
 
