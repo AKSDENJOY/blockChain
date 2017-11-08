@@ -1,6 +1,7 @@
 package joy.aksd.listenAndVerifyThread;
 
 import joy.aksd.ECC.ECC;
+import joy.aksd.coreThread.BroadcastBlock;
 import joy.aksd.coreThread.WriteBlock;
 import joy.aksd.data.Block;
 import joy.aksd.data.Record;
@@ -179,6 +180,7 @@ class handleThread implements Runnable {
             return;
         }
         Block receivedBlock=new Block(receive);
+        //接到的区块比期待区块号大，启动同步工作
         if (byteToInt(receivedBlock.getBlockNumber())>byteToInt(blocks.getLast().getBlockNumber())+1){
             interuptCoreThread();
             System.out.println("receive a higher block,interrupt core process");
@@ -193,14 +195,14 @@ class handleThread implements Runnable {
             } catch (IOException e) {
                 System.err.println("error in sync first connection");
             }
-
 //            backUpChainClear();
             reStartCoreThread();
             System.out.println("restart core process");
         }
+        //接到的区块为期待区块，
         if (byteToInt(receivedBlock.getBlockNumber())==byteToInt(blocks.getLast().getBlockNumber())+1){
             Block last=blocks.getLast();
-            if (Arrays.equals(receivedBlock.getLastHash(),getLastHash(last))){
+            if (Arrays.equals(receivedBlock.getLastHash(),getLastHash(last))){//验证区块是否为连接
                 out.write(0x01);
                 interuptCoreThread();
                 System.out.println("receive a expect block interrupt");
@@ -224,6 +226,11 @@ class handleThread implements Runnable {
                     new WriteBlock(receivedBlock).start();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
+                }
+                try {
+                    new BroadcastBlock(receivedBlock).start();
+                }catch (Exception e){
+                    System.out.println("broadcast error ");
                 }
                 reStartCoreThread();
                 System.out.println("restart ");
