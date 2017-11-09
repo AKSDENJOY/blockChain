@@ -6,7 +6,9 @@ import joy.aksd.listenAndVerifyThread.Listener;
 import joy.aksd.listenAndVerifyThread.verifyThread;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
@@ -49,7 +51,13 @@ public class Main2 {
     public static void main(String[] args) {
         //初始化 设置IP
 
-
+        //获取本地ip
+        try{
+            setLocalIp();
+        }catch (UnknownHostException e) {
+            System.out.println("error to get local ip system exit");
+            return;
+        }
         try {
             recoverFromDisk();
         } catch (IOException e) {
@@ -104,7 +112,14 @@ public class Main2 {
         //endregion
     }
 
+    private static void setLocalIp() throws UnknownHostException {
+        localIp= InetAddress.getLocalHost().getHostAddress();
+        System.out.println(localIp);
+    }
+
     private static void getIPist() throws IOException, ClassNotFoundException {
+        if (ROOTIP.equals(localIp))
+            return;
         Socket socket=new Socket(ROOTIP,PORT);
         OutputStream out=socket.getOutputStream();
         InputStream in=socket.getInputStream();

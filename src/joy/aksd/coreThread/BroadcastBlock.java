@@ -32,7 +32,8 @@ public class BroadcastBlock {
     private void broadcast() {
         System.out.println("broadcast IPlist size"+IPList.size());
         for(String ip:IPList) {
-            broadCastThread.execute(new broadCastThread(ip, this.block));
+            if(!ip.equals(localIp))
+                broadCastThread.execute(new broadCastThread(ip, this.block));
         }
 
         System.out.println("broadcast over");
@@ -94,6 +95,7 @@ class broadCastThread implements Runnable{
             }
         }catch (Exception e){
             e.printStackTrace();
+            System.out.println("connect " +ip+" error" );
             synchronized (IPList){
                 IPList.remove(ip);
             }

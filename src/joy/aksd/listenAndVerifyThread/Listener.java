@@ -156,9 +156,11 @@ class handleThread implements Runnable {
     }
 
     private void addTofriend(DataInputStream in, DataOutputStream out, Socket socket) throws IOException {
-        System.out.println("reveive getip message ");
+
         String ip=socket.getRemoteSocketAddress().toString().split(":")[0];
         ip=ip.substring(1);
+        System.out.println("reveive getip message "+ip);
+
         HashSet<String> tem=new HashSet<>();
         synchronized (IPList) {
             tem.addAll(IPList);
@@ -167,6 +169,7 @@ class handleThread implements Runnable {
         o.writeObject(tem);
         IPList.add(ip);
         System.out.println("receive a connection now ipList size is:"+IPList.size());
+
     }
 
     private void startReceiveBlockProcess(DataInputStream in, DataOutputStream out) throws IOException {
