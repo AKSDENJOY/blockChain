@@ -123,6 +123,7 @@ public class dataInfo {
             if (!checkIP(temIP))
                 it.remove();
         }
+        IPList.add(ROOTIP);
         IPList.addAll(ipList);
     }
 
