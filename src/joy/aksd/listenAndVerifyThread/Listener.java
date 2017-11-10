@@ -218,6 +218,7 @@ class handleThread implements Runnable {
                 synchronized (blocks) {
                     blocks.add(receivedBlock);
                     timeRecord.add(byteToInt(receivedBlock.getTime()));
+                    num++;
                     System.out.println("update blocks and timerecord now size is "+num);
                 }
                 try {
