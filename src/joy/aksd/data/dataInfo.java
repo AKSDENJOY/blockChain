@@ -82,7 +82,9 @@ public class dataInfo {
      * pow中断信号
      */
     public static boolean interupt =false;
-
+    /**
+     * 期待的块号
+     */
     public static int num=0;
 
     public static final String ECNAME="secp160r1";

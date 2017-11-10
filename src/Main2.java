@@ -131,6 +131,8 @@ public class Main2 {
         HashSet<String> tem= (HashSet<String>) inputStream.readObject();
         IPList.addAll(tem);
 
+        IPList.forEach(System.out::println);
+
     }
 
     private static void startSyncBlock() {
@@ -196,7 +198,7 @@ public class Main2 {
         }
         in.close();
         num=byteToInt(blocks.getLast().getBlockNumber())+1;
-        System.out.println("end");
+        System.out.println("end"+num);
     }
 //
 }

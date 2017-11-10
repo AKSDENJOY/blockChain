@@ -60,6 +60,9 @@ class broadCastThread implements Runnable{
 //            out.write(intToByte(block.getBlockDatas().length));
 
             out.write(block.getBlockDatas());
+            System.out.println("send block is ------");
+            System.out.println(block.toString());
+            System.out.println("------");
 
             byte tag[]=new byte[1];
             in.read(tag);
@@ -92,6 +95,10 @@ class broadCastThread implements Runnable{
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
                 objectOutputStream.writeObject(identifedRecord);
                 objectOutputStream.writeObject(unPackageRecord);
+                System.out.println("send rest data");
+                System.out.println(identifedRecord.toString());
+                System.out.println(unPackageRecord.toString());
+                System.out.println("------");
             }
         }catch (Exception e){
             e.printStackTrace();

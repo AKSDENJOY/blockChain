@@ -183,6 +183,10 @@ class handleThread implements Runnable {
             return;
         }
         Block receivedBlock=new Block(receive);
+
+        System.out.println("receive block infomation:------");
+        System.out.println(receivedBlock.toString());
+        System.out.println("------");
         //接到的区块比期待区块号大，启动同步工作
         if (byteToInt(receivedBlock.getBlockNumber())>byteToInt(blocks.getLast().getBlockNumber())+1){
             interuptCoreThread();
@@ -205,15 +209,16 @@ class handleThread implements Runnable {
         //接到的区块为期待区块，
         if (byteToInt(receivedBlock.getBlockNumber())==byteToInt(blocks.getLast().getBlockNumber())+1){
             Block last=blocks.getLast();
+            System.out.println("reveive num is right");
             if (Arrays.equals(receivedBlock.getLastHash(),getLastHash(last))){//验证区块是否为连接
                 out.write(0x01);
                 interuptCoreThread();
-                System.out.println("receive a expect block interrupt");
+                System.out.println("receive a expect block,now interrupt");
 
                 synchronized (blocks) {
                     blocks.add(receivedBlock);
                     timeRecord.add(byteToInt(receivedBlock.getTime()));
-                    System.out.println("update blocks and timerecord");
+                    System.out.println("update blocks and timerecord now size is "+num);
                 }
                 try {
                     updatefewData(in);
@@ -225,11 +230,13 @@ class handleThread implements Runnable {
                     unPackageRecord.clear();
                     identifedRecord=tem;
                 }
+                System.out.println("start write received block");
                 try {
                     new WriteBlock(receivedBlock).start();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
+                System.out.println("start broad received block");
                 try {
                     new BroadcastBlock(receivedBlock).start();
                 }catch (Exception e){
@@ -243,8 +250,12 @@ class handleThread implements Runnable {
 
     private void updatefewData(DataInputStream in) throws IOException, ClassNotFoundException {
         ObjectInputStream objectInputStream=new ObjectInputStream(in);
+        System.out.println("receive rest data ------");
         ArrayList<Record> temIdentifedRecord= (ArrayList<Record>) objectInputStream.readObject();
         ArrayList<Record> temUnPackageRecord= (ArrayList<Record>) objectInputStream.readObject();
+        System.out.println(temIdentifedRecord.toString());
+        System.out.println(temUnPackageRecord.toString());
+        System.out.println("------");
 
         System.out.println("update few data");
         identifedRecord= temIdentifedRecord;
@@ -254,6 +265,7 @@ class handleThread implements Runnable {
         tem.addAll(identifedRecord);
         unPackageRecord.clear();
         identifedRecord=tem;
+        num=blocks.getLast().getBlockByteNum()+1;
 
     }
 
