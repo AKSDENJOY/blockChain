@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 import static joy.aksd.data.dataInfo.*;
 import static joy.aksd.data.protocolInfo.GETIPLIST;
@@ -99,7 +100,7 @@ public class Main2 {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-//        System.out.println("shut down the joy.aksd.coreThread.coreProcess,10's restart");
+//        System.out.println("shut down the joy.aksd.coreThread.coreProcess");
 //        interuptCoreThread();
 //
 //        try {

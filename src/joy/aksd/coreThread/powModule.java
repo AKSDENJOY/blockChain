@@ -3,6 +3,7 @@ package joy.aksd.coreThread;
 import joy.aksd.data.Block;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
 
 import static joy.aksd.data.dataInfo.*;
 import static joy.aksd.tools.toByte.intToByte;
@@ -26,10 +27,12 @@ public class powModule {
         System.arraycopy(merkle,0,tem,lashHash.length,merkle.length);
         tem[lashHash.length+merkle.length+4]=difficulty;
         for (int i=0;true;i++){
-            if (Thread.currentThread().isInterrupted())
-                Thread.currentThread().sleep(1);
-            if (interupt)
+            if (interupt){
                 Thread.currentThread().interrupt();
+                if (Thread.currentThread().isInterrupted()){
+                    TimeUnit.SECONDS.sleep(1);
+                }
+            }
             if (i==Integer.MAX_VALUE)
                 i=0;
             byte[]time=intToByte(getUnixTime());
