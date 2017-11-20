@@ -46,7 +46,8 @@ public class powModule {
                     blocks.remove(0);
                 blocks.addLast(block);
                 timeRecord.add(byteToInt(time));
-                block.setBlockNumber(num++);
+                num=byteToInt(blocks.getLast().getBlockNumber())+1;
+                block.setBlockNumber(num);
                 return;
             }
         }

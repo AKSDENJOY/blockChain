@@ -218,7 +218,7 @@ class handleThread implements Runnable {
                 synchronized (blocks) {
                     blocks.add(receivedBlock);
                     timeRecord.add(byteToInt(receivedBlock.getTime()));
-                    num++;
+                    num=byteToInt(blocks.getLast().getBlockNumber());
                     System.out.println("update blocks and timerecord now size is "+num);
                 }
                 try {
@@ -266,7 +266,6 @@ class handleThread implements Runnable {
         tem.addAll(identifedRecord);
         unPackageRecord.clear();
         identifedRecord=tem;
-        num=blocks.getLast().getBlockByteNum()+1;
 
     }
 

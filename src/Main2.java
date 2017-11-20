@@ -198,7 +198,7 @@ public class Main2 {
             }
         }
         in.close();
-        num=byteToInt(blocks.getLast().getBlockNumber())+1;
+        num=byteToInt(blocks.getLast().getBlockNumber());
         System.out.println("end"+num);
     }
 //
