@@ -44,9 +44,9 @@ public class powModule {
                 block.setTime(time);
                 while (blocks.size()>cacheBlockCount)//缓存最近cacheBlockCount个区块
                     blocks.remove(0);
+                num=byteToInt(blocks.getLast().getBlockNumber())+1;
                 blocks.addLast(block);
                 timeRecord.add(byteToInt(time));
-                num=byteToInt(blocks.getLast().getBlockNumber())+1;
                 block.setBlockNumber(num);
                 return;
             }
