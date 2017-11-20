@@ -197,7 +197,7 @@ class handleThread implements Runnable {
 //                SycnFromOthers(in,out);//同步最近200块，不够200则全同步
 //            }
             try {
-                out.write(0x00);
+                out.write(0x02);
                 SycnFromOthers(in,out);//同步最近200块，不够200则全同步
             } catch (IOException e) {
                 System.err.println("error in sync first connection");

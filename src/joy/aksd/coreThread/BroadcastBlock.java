@@ -67,7 +67,7 @@ class broadCastThread implements Runnable{
             byte tag[]=new byte[1];
             in.read(tag);
 
-            if (tag[0] == 0x00) {//同步区块
+            if (tag[0] == 0x02) {//同步区块
                 LinkedList<Block> copyBlock = new LinkedList<>();
                 synchronized (blocks){
                     copyBlock.addAll(blocks);
