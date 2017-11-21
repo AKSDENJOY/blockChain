@@ -104,7 +104,7 @@ class broadCastThread implements Runnable{
                 System.out.println(indexBlock.size());
                 System.out.println(timeRecord.size());
             }
-            else {
+            else if (tag[0] == 0x01){
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
                 objectOutputStream.writeObject(identifedRecord);
                 objectOutputStream.writeObject(unPackageRecord);
