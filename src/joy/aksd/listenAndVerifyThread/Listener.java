@@ -191,11 +191,6 @@ class handleThread implements Runnable {
         if (byteToInt(receivedBlock.getBlockNumber())>byteToInt(blocks.getLast().getBlockNumber())+1){
             interuptCoreThread();
             System.out.println("receive a higher block,interrupt core process");
-//            if (backUpChainIsAvailable(receivedBlock)){
-//                useBack(receivedBlock);//替换blocks
-//            }else {
-//                SycnFromOthers(in,out);//同步最近200块，不够200则全同步
-//            }
             try {
                 out.write(0x02);
                 SycnFromOthers(in,out);//同步最近200块，不够200则全同步
@@ -285,12 +280,15 @@ class handleThread implements Runnable {
         System.out.println("update 200 data");
 
         ObjectInputStream objectInputStream=new ObjectInputStream(in);
+        LinkedList<Block> receiveblocks= (LinkedList<Block>) objectInputStream.readObject();
         ConcurrentHashMap<String, Record> temVerifyRecord2=(ConcurrentHashMap<String, Record>) objectInputStream.readObject();
         ArrayList<Record> temIdentifedRecord= (ArrayList<Record>) objectInputStream.readObject();
         ArrayList<Record> temUnPackageRecord= (ArrayList<Record>) objectInputStream.readObject();
         ArrayList<Long> temIndexBlock= (ArrayList<Long>) objectInputStream.readObject();
         ArrayList<Integer> temTimeRecord= (ArrayList<Integer>) objectInputStream.readObject();
 
+        blocks.clear();
+        blocks.addAll(receiveblocks);
 
         verifyRecord2= temVerifyRecord2;
         identifedRecord= temIdentifedRecord;
@@ -302,58 +300,28 @@ class handleThread implements Runnable {
         tem.addAll(identifedRecord);
         unPackageRecord.clear();
         identifedRecord=tem;
+        try {
+            reWriteToHardrie(receiveblocks);
+        }catch (IOException e){
+            System.out.println("error in writting");
+            throw e;
+        }
 
 
     }
 
     private void SycnFromOthers(DataInputStream in, DataOutputStream out) throws IOException {
 
-        byte[] count=new byte[4];
-        in.read(count);
-        System.out.println("start sync block 200");
-        int counts=byteToInt(count);
-        ArrayList<Block> receivedBlock=new ArrayList<>();
-        for (int i=0;i<counts;i++){
-            count=new byte[4];
-            in.read(count);
-            count=new byte[byteToInt(count)];
-            in.read(count);
-            Block block=new Block(count);
-            receivedBlock.add(block);
-        }
-        Block firstBlock=receivedBlock.get(0);
-        LinkedList<Block> copyBlock=new LinkedList<>();//备用blocks
-        Collections.copy(copyBlock,blocks);
-        for (int i=0;i<copyBlock.size();i++){
-            if (Arrays.equals(copyBlock.removeLast().getBlockNumber(),firstBlock.getBlockNumber())){
-                break;
-            }
-        }
-        copyBlock.addAll(receivedBlock);
-
         try {
             updateProgramData(in,out);
         } catch (Exception e) {
             System.err.println("error in sync");
-            return;
-        }
-
-
-        blocks.clear();
-        blocks.addAll(copyBlock);
-
-
-        //rewrite last 200block to hardrive
-        try {
-            reWriteToHardrie(receivedBlock);//重新写received block 块
-
-        }catch (IOException e){
-            System.out.println("error in write to hard-drive");
+            System.exit(1);
         }
 
     }
 
-    private void reWriteToHardrie(ArrayList<Block> receivedBlock) throws IOException {
+    private void reWriteToHardrie(LinkedList<Block> receivedBlock) throws IOException {
         Block first=receivedBlock.get(0);
         long cur=indexBlock.get(byteToInt(first.getBlockNumber()));
         RandomAccessFile f=new RandomAccessFile(location,"rw");

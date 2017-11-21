@@ -73,18 +73,23 @@ class broadCastThread implements Runnable{
                     copyBlock.addAll(blocks);
                 }
 //                Collections.copy(copyBlock, blocks);
-                if (copyBlock.size() >= 200) {
-                    out.write(intToByte(200));
-                } else {
-                    out.write(intToByte(copyBlock.size()));
-                }
 
-                for (int i = 0; i < copyBlock.size() && i < 200; i++) {
-                    Block temBlock = copyBlock.removeLast();
-                    out.write(intToByte(temBlock.getBlockDatas().length));
-                    out.write(temBlock.getBlockDatas());
-                }
+                //region 原本只同步部分区块，现更改为全部blocks
+//                if (copyBlock.size() >= 20) {
+//                    out.write(intToByte(20));
+//                } else {
+//                    out.write(intToByte(copyBlock.size()));
+//                }
+//
+//                for (int i = 0; i < copyBlock.size() && i < 200; i++) {
+//                    Block temBlock = copyBlock.removeLast();
+//                    out.write(intToByte(temBlock.getBlockDatas().length));
+//                    out.write(temBlock.getBlockDatas());
+//                }
+                //endregion
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
+                objectOutputStream.writeObject(copyBlock);
+
                 objectOutputStream.writeObject(verifyRecord2);
                 objectOutputStream.writeObject(identifedRecord);
                 objectOutputStream.writeObject(unPackageRecord);
