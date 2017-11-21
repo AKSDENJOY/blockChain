@@ -90,11 +90,19 @@ class broadCastThread implements Runnable{
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
                 objectOutputStream.writeObject(copyBlock);
 
+                System.out.println(copyBlock.size());
+
                 objectOutputStream.writeObject(verifyRecord2);
                 objectOutputStream.writeObject(identifedRecord);
                 objectOutputStream.writeObject(unPackageRecord);
                 objectOutputStream.writeObject(indexBlock);
                 objectOutputStream.writeObject(timeRecord);
+
+                System.out.println(verifyRecord2.toString());
+                System.out.println(identifedRecord.toString());
+                System.out.println(unPackageRecord.toString());
+                System.out.println(indexBlock.size());
+                System.out.println(timeRecord.size());
             }
             else {
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);

@@ -277,7 +277,7 @@ class handleThread implements Runnable {
 
     private void updateProgramData(DataInputStream in, DataOutputStream out) throws IOException, ClassNotFoundException {
         //verifyRecord2   identifedRecord  unPackageRecord indexBlock timeRecord
-        System.out.println("update 200 data");
+        System.out.println("update data");
 
         ObjectInputStream objectInputStream=new ObjectInputStream(in);
         LinkedList<Block> receiveblocks= (LinkedList<Block>) objectInputStream.readObject();
@@ -286,6 +286,13 @@ class handleThread implements Runnable {
         ArrayList<Record> temUnPackageRecord= (ArrayList<Record>) objectInputStream.readObject();
         ArrayList<Long> temIndexBlock= (ArrayList<Long>) objectInputStream.readObject();
         ArrayList<Integer> temTimeRecord= (ArrayList<Integer>) objectInputStream.readObject();
+
+        System.out.println(receiveblocks.size());
+        System.out.println(temVerifyRecord2.toString());
+        System.out.println(temIdentifedRecord.toString());
+        System.out.println(temUnPackageRecord.toString());
+        System.out.println(temIndexBlock.size());
+        System.out.println(temTimeRecord.size());
 
         blocks.clear();
         blocks.addAll(receiveblocks);
