@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.net.*;
 import java.security.*;
 import java.security.spec.ECPoint;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 import static joy.aksd.data.dataInfo.*;
@@ -68,6 +69,10 @@ public class CreatRecord {
         System.arraycopy(orderStampAndTime,4,time,0,4);
 //        byte[] time = intToByte(getUnixTime());
         System.out.println("4 " + time.length);
+        if (Arrays.equals(time,new byte[4])) {
+            System.out.println("not exist");
+            return;
+        }
         //生成解锁脚本
         byte[] unLockScript = null;
         try {
@@ -92,11 +97,13 @@ public class CreatRecord {
             out = socket.getOutputStream();
             in = socket.getInputStream();
             out.write(RECIVERECORD);
-            out.write(record.getMac());
-            out.write(record.getOrderStamp());
-            out.write(record.getTime());
-            out.write(record.getLockScript());
-            out.write(record.getUnLockScript());
+            out.write(intToByte(TTL));
+            out.write(record.getBytesData());
+//            out.write(record.getMac());
+//            out.write(record.getOrderStamp());
+//            out.write(record.getTime());
+//            out.write(record.getLockScript());
+//            out.write(record.getUnLockScript());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

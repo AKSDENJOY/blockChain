@@ -41,6 +41,7 @@ public class Listener extends Thread {
         while (true) {
             Socket socket = null;
             try {
+                assert serverSocket != null;
                 socket = serverSocket.accept();
                 System.out.println("receive a connection");
             } catch (IOException e) {
@@ -55,68 +56,84 @@ public class Listener extends Thread {
 class handleThread implements Runnable {
     private Socket socket;
 
-    public handleThread(Socket socket) {
+    handleThread(Socket socket) {
         this.socket = socket;
         new Thread(this).start();
     }
 
     @Override
     public void run() {
-        DataInputStream in = null;
-        DataOutputStream out=null;
+        DataInputStream in ;
+        DataOutputStream out;
         try {
             in = new DataInputStream(socket.getInputStream());
             out=new DataOutputStream(socket.getOutputStream());
             byte tag = in.readByte();
-            Record record = null;
-            byte[] receive = null;
+            Record record ;
+            byte[] receive ;
             int i;
             byte tem[];
             switch (tag) {
                 case REGISTER://新用户注册进区块链
                     //admin
                     System.out.println("register");
+                    receive=new byte[4];
+                    in.read(receive);
+                    int ttl=byteToInt(receive);
                     receive =new byte[2];
                     in.read(receive);
                     receive=new byte[byteToInt(receive)];
                     in.read(receive);
                     record = new Record(receive);
-                    dealRegistRecord(record);
+                    if (ttl!=0)
+                        dealRegistRecord(record,ttl);
                     this.socket.close();
                     break;
                 case RECIVERECORD://收到纪录
                     System.out.println("received record");
-                    record = new Record();
-                    receive = new byte[6];
-                    in.read(receive);
-                    record.setMac(receive);
                     receive=new byte[4];
                     in.read(receive);
-                    record.setOrderStamp(receive);
-                    receive=new byte[4];
+                    ttl=byteToInt(receive);
+                    receive =new byte[2];
                     in.read(receive);
-                    record.setTime(receive);
-                    receive=new byte[32];
+                    receive=new byte[byteToInt(receive)];
                     in.read(receive);
-                    record.setLockScript(receive);
-                    receive=new byte[100];
-                    i=in.read(receive);
-                    tem=new byte[i];
-                    System.arraycopy(receive,0,tem,0,i);
-                    record.setUnLockScript(tem);
-                    dealRecord(record);
+                    record = new Record(receive);
+//                    record = new Record();
+//                    receive = new byte[6];
+//                    in.read(receive);
+//                    record.setMac(receive);
+//                    receive=new byte[4];
+//                    in.read(receive);
+//                    record.setOrderStamp(receive);
+//                    receive=new byte[4];
+//                    in.read(receive);
+//                    record.setTime(receive);
+//                    receive=new byte[32];
+//                    in.read(receive);
+//                    record.setLockScript(receive);
+//                    receive=new byte[100];
+//                    i=in.read(receive);
+//                    tem=new byte[i];
+//                    System.arraycopy(receive,0,tem,0,i);
+//                    record.setUnLockScript(tem);
+                    if (ttl!=0)
+                        dealRecord(record,ttl);
                     this.socket.close();
 //                in.read(receive);
                     break;
                 case 0x02:
+                    System.out.println("send result");
                     sendResult(out);
                     this.socket.close();
                     break;
                 case 0x03://查询顺序戳
+                    System.out.println("orderstamp and time");
                     sendOrderStampAndTime(in,out);
                     this.socket.close();
                     break;
                 case 0x0f://测试链接
+                    System.out.println("test link");
                     break;
                 case SELFQUERY://查询个人记录
                     System.out.println("query self informaiton");
@@ -137,7 +154,8 @@ class handleThread implements Runnable {
                     startTransfer(in,out);
                     break;
                 case GETIPLIST:
-                    addTofriend(in,out,this.socket);
+                    System.out.println("get list");
+                    addTofriend(in,out);
                 default:
                     break;
             }
@@ -156,9 +174,9 @@ class handleThread implements Runnable {
         }
     }
 
-    private void addTofriend(DataInputStream in, DataOutputStream out, Socket socket) throws IOException {
+    private void addTofriend(DataInputStream in, DataOutputStream out) throws IOException {
 
-        String ip=socket.getRemoteSocketAddress().toString().split(":")[0];
+        String ip=this.socket.getRemoteSocketAddress().toString().split(":")[0];
         ip=ip.substring(1);
         System.out.println("reveive getip message "+ip);
 
@@ -194,7 +212,7 @@ class handleThread implements Runnable {
             System.out.println("receive a higher block,interrupt core process");
             try {
                 out.write(0x02);
-                SycnFromOthers(in,out);//同步最近200块，不够200则全同步
+                SycnFromOthers(in,out);//同步
             } catch (IOException e) {
                 System.err.println("error in sync first connection");
             }
@@ -557,15 +575,16 @@ class handleThread implements Runnable {
         in.read(receive);
         String key=byteToString(receive);
         if (!verifyRecord2.containsKey(key)){
-            out.write(new byte[4]);
+            System.out.println("not exist");
+            out.write(new byte[8]);
+        }else {
+            Record record = verifyRecord2.get(key);
+            out.write(record.getOrderStamp());
+            out.write(intToByte(getUnixTime()));
         }
-        Record record=verifyRecord2.get(key);
-        out.write(record.getOrderStamp());
-        out.write(intToByte(getUnixTime()));
-
     }
 
-    private static void sendResult(OutputStream out) throws IOException {
+    private void sendResult(OutputStream out) throws IOException {
         synchronized (verifyRecord1){
             out.write(intToByte(verifyRecord1.size()));
             Iterator<Record> iterator= verifyRecord1.iterator();
@@ -576,25 +595,31 @@ class handleThread implements Runnable {
         }
     }
 
-    public static void dealRecord(Record record){
+    public void dealRecord(Record record,int ttl){
         if (verifyScriptRecord(record)){
             verifyRecord1.add(record);
             System.out.println("handle one   "+ verifyRecord1.size());
             //转发
-            new BroadcastRecord(record,null).start();
+            System.out.println(this.socket.getRemoteSocketAddress().toString().split(":")[0]);
+            new BroadcastRecord(record,(this.socket.getRemoteSocketAddress().toString().split(":")[0]).substring(1),ttl).start();
         }
     }
 
-    public static void dealRegistRecord(Record record){
+    public void dealRegistRecord(Record record,int ttl){
         if (verifyScriptRecord(record)) {
             String key=byteToString(record.getLockScript());
-            verifyRecord2.put(key,record);
+            if (!verifyRecord2.containsKey(key)) {
+                verifyRecord2.put(key, record);
+                System.out.println("already not exist");
+            }
+            System.out.println(verifyRecord2.toString());
+            System.out.println("register success start broadcast");
             //转发
-            new BroadcastRecord(record,null).start();
+            new BroadcastRecord(record,(this.socket.getRemoteSocketAddress().toString().split(":")[0]).substring(1),ttl,true).start();
         }
     }
 
-    private static boolean verifyScriptRecord(Record record) {
+    private boolean verifyScriptRecord(Record record) {
         MessageDigest digest= null;
         try {
             digest = MessageDigest.getInstance("SHA-256");

@@ -62,6 +62,7 @@ public class dataInfo {
 //    public static final int exceptTime=1920;//单位：秒
     public static final int exceptTime=60;//单位：秒
     public static final int errorTime=5;//单位：秒
+    public static final int TTL=5;
     /**
      * 区块存储位置
      */

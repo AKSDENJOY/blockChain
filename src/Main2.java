@@ -65,6 +65,11 @@ public class Main2 {
             System.out.println("error in recover");
 //            return;
         }
+
+        //region print info
+        printInfo();
+        //endregion
+
         //监听线程启动
         new Listener().start();
         //验证线程启动
@@ -200,6 +205,13 @@ public class Main2 {
         in.close();
         num=byteToInt(blocks.getLast().getBlockNumber());
         System.out.println("end"+num);
+    }
+
+
+    public static void printInfo(){
+        System.out.println("blocks size is "+blocks.size());
+        System.out.println("verify2 \n"+verifyRecord2.toString());
+        System.out.println("verify1 \n"+verifyRecord1.toString());
     }
 //
 }

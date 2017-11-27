@@ -11,11 +11,11 @@ import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Scanner;
 
-import static joy.aksd.data.dataInfo.ECNAME;
-import static joy.aksd.data.dataInfo.PORT;
-import static joy.aksd.data.dataInfo.ROOTIP;
+import static joy.aksd.data.dataInfo.*;
 import static joy.aksd.data.protocolInfo.REGISTER;
 import static joy.aksd.tools.toByte.hexStringToByteArray;
+import static joy.aksd.tools.toByte.intToByte;
+import static joy.aksd.tools.toByte.intToOneByte;
 import static joy.aksd.tools.toString.byteToString;
 
 /**
@@ -48,6 +48,7 @@ public class registUser {
         OutputStream out=null;
         out=socket.getOutputStream();
         out.write(REGISTER);
+        out.write(intToByte(TTL));
         out.write(record.getBytesData());
         out.close();
         System.out.println("regist phrase1 over");
