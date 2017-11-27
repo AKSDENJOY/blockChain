@@ -2,6 +2,7 @@ package joy.aksd.listenAndVerifyThread;
 
 import joy.aksd.ECC.ECC;
 import joy.aksd.coreThread.BroadcastBlock;
+import joy.aksd.coreThread.BroadcastRecord;
 import joy.aksd.coreThread.WriteBlock;
 import joy.aksd.data.Block;
 import joy.aksd.data.Record;
@@ -580,6 +581,7 @@ class handleThread implements Runnable {
             verifyRecord1.add(record);
             System.out.println("handle one   "+ verifyRecord1.size());
             //转发
+            new BroadcastRecord(record,null).start();
         }
     }
 
@@ -588,6 +590,7 @@ class handleThread implements Runnable {
             String key=byteToString(record.getLockScript());
             verifyRecord2.put(key,record);
             //转发
+            new BroadcastRecord(record,null).start();
         }
     }
 
