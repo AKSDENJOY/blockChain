@@ -21,11 +21,13 @@ public class powModule {
         byte target[]=getTarget(block.getDifficulty());
         byte[] lashHash=block.getLastHash();
         byte[] merkle=block.getMerkle();
+        byte[] cumulativeDiff=block.getCumulativeDifficulty();
         byte difficulty=block.getDifficulty();
         byte[] tem=new byte[block.getBlockByteNum()];
         System.arraycopy(lashHash,0,tem,0,lashHash.length);
         System.arraycopy(merkle,0,tem,lashHash.length,merkle.length);
-        tem[lashHash.length+merkle.length+4]=difficulty;
+        System.arraycopy(cumulativeDiff,0,tem,lashHash.length+merkle.length,cumulativeDiff.length);
+        tem[lashHash.length+merkle.length+cumulativeDiff.length+4]=difficulty;//+4 为后面的4字节time字段
         for (int i=0;true;i++){
             if (interupt){
                 Thread.currentThread().interrupt();
@@ -37,8 +39,8 @@ public class powModule {
                 i=0;
             byte[]time=intToByte(getUnixTime());
             byte[]nonce=intToByte(i);
-            System.arraycopy(time,0,tem,lashHash.length+merkle.length,time.length);
-            System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+time.length+1,nonce.length);
+            System.arraycopy(time,0,tem,lashHash.length+merkle.length+cumulativeDiff.length,time.length);
+            System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+cumulativeDiff.length+time.length+1,nonce.length);//+1 为上面diffculty的一字节字段
             if (isRight(SHA256x.digest(tem),target)){
                 block.setNonce(nonce);
                 block.setTime(time);

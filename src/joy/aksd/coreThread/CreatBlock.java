@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static joy.aksd.data.dataInfo.*;
+import static joy.aksd.tools.toByte.intToByte;
+import static joy.aksd.tools.toInt.byteToInt;
 
 /** 创建区块
  * Created by EnjoyD on 2017/4/18.
@@ -24,8 +26,16 @@ public class CreatBlock {
         block.setMerkle(generateMerkle(block));
         //获取难度值
         block.setDifficulty(getDifficulty(blocks.getLast().getDifficulty()));
-        //返回为完成的block
+        //设置累计区块难度
+        block.setCumulativeDifficulty(getCurrentCumulativeDifficulty(block.getDifficulty(),blocks.getLast().getCumulativeDifficulty()));
+        //返回未完成的block
         return block;
+    }
+
+    private byte[] getCurrentCumulativeDifficulty(byte difficulty, byte[] cumulativeDifficulty) {
+        int diff=(int)difficulty+byteToInt(cumulativeDifficulty);
+        System.out.println("diff is "+diff);
+        return intToByte(diff);
     }
 
     private byte getDifficulty(byte difficulty) {

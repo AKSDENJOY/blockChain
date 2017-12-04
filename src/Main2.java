@@ -61,7 +61,7 @@ public class Main2 {
         }
         try {
             recoverFromDisk();
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("error in recover");
 //            return;
         }
@@ -75,7 +75,7 @@ public class Main2 {
         //验证线程启动
         new verifyThread().start();
 
-        startSyncBlock();
+//        startSyncBlock();
 
         try {
             creatFirstBlock.start();

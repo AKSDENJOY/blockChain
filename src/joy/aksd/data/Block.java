@@ -14,6 +14,7 @@ public class Block implements Serializable{
     private byte time[];//4bytes
     private byte difficulty;//1 bytes难度目标，
     private byte nonce[];//4 bytes
+    private byte cumulativeDifficulty[];//积累难度值，用于区块共识4 bytes
 
     private byte data[];
 
@@ -29,25 +30,37 @@ public class Block implements Serializable{
         byte tem[]=new byte[32];
         System.arraycopy(count,0,tem,0,32);
         setLastHash(tem);
+
         tem=new byte[32];
         System.arraycopy(count,lastHash.length,tem,0,32);
         setMerkle(tem);
+
         tem=new byte[4];
         System.arraycopy(count,lastHash.length+Merkle.length,tem,0,4);
         setTime(tem);
+
         setDifficulty(count[lastHash.length+Merkle.length+time.length]);
+
         tem=new byte[4];
         System.arraycopy(count,lastHash.length+Merkle.length+time.length+1,tem,0,4);
         setNonce(tem);
+
         tem=new byte[3];
         System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length,tem,0,3);
         setBlockNumber(tem);
+
+        tem=new byte[4];
+        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length,tem,0,4);
+        setCumulativeDifficulty(tem);
+
         tem=new byte[2];
-        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length,tem,0,2);
+        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length,tem,0,2);
         setRecordCount(tem);
-        tem=new byte[count.length-(lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length)];
+
+        tem=new byte[count.length-(lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length)];
         System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length,tem,0,tem.length);
         setData(tem);
+
     }
 
     private void setRecordCount(byte[] tem) {
@@ -114,7 +127,7 @@ public class Block implements Serializable{
      * @return 头部长度
      */
     public int getBlockByteNum(){
-        return 32+32+4+4+1;
+        return 32+32+4+4+1+4;
     }
 
     @Override
@@ -122,7 +135,8 @@ public class Block implements Serializable{
         return "num:"+byteToInt(blockNumber)+"\n"+
                 "nonce:"+byteToInt(nonce)+"\n"+
                 "diff:"+(difficulty&0xff)+"\n"+
-                "time:"+byteToInt(time);
+                "time:"+byteToInt(time)+"\n"+
+                "cumulativeDifficulty:"+byteToInt(cumulativeDifficulty)+"\n";
 
     }
 
@@ -150,7 +164,7 @@ public class Block implements Serializable{
      * @return  block字节数组 读取时先读取前两字节得到整个区块长度，然后再读取剩余字节用构造函数生成区块
      */
     public byte[] getBlockDatas(){
-        int i=lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length+data.length;
+        int i=lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length+data.length;
         byte result[]=new byte[2+i];
         byte tem[]=intToByte(i);
         System.arraycopy(tem,2,result,0,2);
@@ -160,8 +174,17 @@ public class Block implements Serializable{
         result[2+lastHash.length+Merkle.length+time.length]=difficulty;
         System.arraycopy(nonce,0,result,2+lastHash.length+Merkle.length+time.length+1,nonce.length);
         System.arraycopy(blockNumber,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length,blockNumber.length);
-        System.arraycopy(recordCount,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length,recordCount.length);
-        System.arraycopy(data,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length,data.length);
+        System.arraycopy(cumulativeDifficulty,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length,cumulativeDifficulty.length);
+        System.arraycopy(recordCount,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length,recordCount.length);
+        System.arraycopy(data,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length,data.length);
         return result;
+    }
+
+    public byte[] getCumulativeDifficulty() {
+        return cumulativeDifficulty;
+    }
+
+    public void setCumulativeDifficulty(byte [] cumulativeDifficulty) {
+        this.cumulativeDifficulty = cumulativeDifficulty;
     }
 }

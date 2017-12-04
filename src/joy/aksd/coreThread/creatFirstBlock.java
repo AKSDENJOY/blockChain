@@ -23,6 +23,7 @@ public class creatFirstBlock {
             block.setLastHash(lastHash);
             block.setDifficulty((byte) 0x14);
             block.setBlockNumber(num);
+            block.setCumulativeDifficulty(new byte[4]);
             getNonceAndTime(block);
             block.setRecordCount(0);
             block.setData(new byte[0]);
@@ -35,7 +36,7 @@ public class creatFirstBlock {
     private static void getNonceAndTime(Block block) throws NoSuchAlgorithmException {
         try {
             findNonceAndTime(block);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             System.out.println("error in firstBlock");
         }
     }
