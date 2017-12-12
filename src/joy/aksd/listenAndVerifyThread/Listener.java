@@ -206,59 +206,63 @@ class handleThread implements Runnable {
         System.out.println("receive block infomation:------");
         System.out.println(receivedBlock.toString());
         System.out.println("------");
-        //接到的区块比期待区块号大，启动同步工作
-        if (byteToInt(receivedBlock.getBlockNumber())>byteToInt(blocks.getLast().getBlockNumber())+1){
-            interuptCoreThread();
-            System.out.println("receive a higher block,interrupt core process");
-            try {
-                out.write(0x02);
-                SycnFromOthers(in,out);//同步
-            } catch (IOException e) {
-                System.err.println("error in sync first connection");
-            }
-//            backUpChainClear();
-            reStartCoreThread();
-            System.out.println("restart core process");
-        }
-        //接到的区块为期待区块，
-        if (byteToInt(receivedBlock.getBlockNumber())==byteToInt(blocks.getLast().getBlockNumber())+1){
-            Block last=blocks.getLast();
-            System.out.println("reveive num is right");
-            if (Arrays.equals(receivedBlock.getLastHash(),getLastHash(last))){//验证区块是否为连接
-                out.write(0x01);
-                interuptCoreThread();
-                System.out.println("receive a expect block,now interrupt");
+        //区块累计难度更大，则为有效区块
+        if (byteToInt(receivedBlock.getCumulativeDifficulty())>byteToInt(blocks.getLast().getCumulativeDifficulty())) {
 
-                synchronized (blocks) {
-                    blocks.add(receivedBlock);
-                    timeRecord.add(byteToInt(receivedBlock.getTime()));
-                    num=byteToInt(blocks.getLast().getBlockNumber());
-                    System.out.println("update blocks and timerecord now size is "+num);
-                }
+            //接到的区块比期待区块号大，启动同步工作
+            if (byteToInt(receivedBlock.getBlockNumber()) > byteToInt(blocks.getLast().getBlockNumber()) + 1) {
+                interuptCoreThread();
+                System.out.println("receive a higher block,interrupt core process");
                 try {
-                    updatefewData(in);
-                }catch (Exception e) {
-                    System.err.println("error in updatefewdata");
-                    ArrayList<Record> tem=new ArrayList<>();
-                    tem.addAll(unPackageRecord);
-                    tem.addAll(identifedRecord);
-                    unPackageRecord.clear();
-                    identifedRecord=tem;
+                    out.write(0x02);
+                    SycnFromOthers(in, out);//同步
+                } catch (IOException e) {
+                    System.err.println("error in sync first connection");
                 }
-                System.out.println("start write received block");
-                try {
-                    new WriteBlock(receivedBlock).start();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("start broad received block");
-                try {
-                    new BroadcastBlock(receivedBlock).start();
-                }catch (Exception e){
-                    System.out.println("broadcast error ");
-                }
+//            backUpChainClear();
                 reStartCoreThread();
-                System.out.println("restart ");
+                System.out.println("restart core process");
+            }
+            //接到的区块为期待区块，
+            if (byteToInt(receivedBlock.getBlockNumber()) == byteToInt(blocks.getLast().getBlockNumber()) + 1) {
+                Block last = blocks.getLast();
+                System.out.println("reveive num is right");
+                if (Arrays.equals(receivedBlock.getLastHash(), getLastHash(last))) {//验证区块是否为连接
+                    out.write(0x01);
+                    interuptCoreThread();
+                    System.out.println("receive a expect block,now interrupt");
+
+                    synchronized (blocks) {
+                        blocks.add(receivedBlock);
+                        timeRecord.add(byteToInt(receivedBlock.getTime()));
+                        num = byteToInt(blocks.getLast().getBlockNumber());
+                        System.out.println("update blocks and timerecord now size is " + num);
+                    }
+                    try {
+                        updatefewData(in);
+                    } catch (Exception e) {
+                        System.err.println("error in updatefewdata");
+                        ArrayList<Record> tem = new ArrayList<>();
+                        tem.addAll(unPackageRecord);
+                        tem.addAll(identifedRecord);
+                        unPackageRecord.clear();
+                        identifedRecord = tem;
+                    }
+                    System.out.println("start write received block");
+                    try {
+                        new WriteBlock(receivedBlock).start();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("start broad received block");
+                    try {
+                        new BroadcastBlock(receivedBlock).start();
+                    } catch (Exception e) {
+                        System.out.println("broadcast error ");
+                    }
+                    reStartCoreThread();
+                    System.out.println("restart ");
+                }
             }
         }
     }
