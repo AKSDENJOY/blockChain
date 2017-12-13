@@ -63,6 +63,8 @@ public class Main2 {
             recoverFromDisk();
         } catch (Exception e) {
             System.out.println("error in recover");
+//            blocks.removeLast();
+//            timeRecord.remove(timeRecord.size()-1);
 //            return;
         }
 

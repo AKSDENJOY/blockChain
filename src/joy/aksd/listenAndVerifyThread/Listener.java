@@ -36,7 +36,8 @@ public class Listener extends Thread {
             serverSocket = new ServerSocket(PORT);
             System.out.println("start listen");
         } catch (IOException e) {
-            System.out.println("servsocket error");
+            System.err.println("servsocket error");
+            System.exit(1);
         }
         while (true) {
             Socket socket = null;

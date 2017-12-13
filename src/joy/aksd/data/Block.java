@@ -58,7 +58,7 @@ public class Block implements Serializable{
         setRecordCount(tem);
 
         tem=new byte[count.length-(lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length)];
-        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+recordCount.length,tem,0,tem.length);
+        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length,tem,0,tem.length);
         setData(tem);
 
     }

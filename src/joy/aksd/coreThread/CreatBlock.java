@@ -6,6 +6,7 @@ import joy.aksd.data.Record;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -107,10 +108,12 @@ public class CreatBlock {
         block.setRecordCount(result.size());
         //填充block 的data数据
         byte BlockData[]=new byte[bytes];
+        System.out.println("block data length is "+bytes);
         bytes=0;
         for (byte[] tem : result) {
             System.arraycopy(tem, 0, BlockData, bytes, tem.length);
             bytes += tem.length;
+            System.out.println(Arrays.toString(tem));
         }
         block.setData(BlockData);
         //开始计算merkle tree root

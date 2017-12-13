@@ -30,7 +30,8 @@ public class Main {
             tem=new byte[byteCount];
             in.read(tem);
             Block block=new Block(tem);
-//            System.out.println(block);
+            System.out.println(block);
+            System.out.println(byteToInt(block.getRecordCount()));
             //读取纪录
             byte blockData[]=block.getData();
             int x=0;
