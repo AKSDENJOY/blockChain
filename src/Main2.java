@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
@@ -202,6 +203,7 @@ public class Main2 {
                 Record record=new Record(tem);
                 //添加未使用纪录
                 verifyRecord2.put(byteToString(record.getLockScript()),record);
+                System.out.println(record+" "+byteToString(record.getLockScript()));
             }
         }
         in.close();
