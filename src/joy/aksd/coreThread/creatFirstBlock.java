@@ -27,6 +27,7 @@ public class creatFirstBlock {
             getNonceAndTime(block);
             block.setRecordCount(0);
             block.setData(new byte[0]);
+            block.setMinerID(moneyAddress);
             blocks.add(block);
             new WriteBlock(block).start();
 //            indexBlock.add((long) 0);

@@ -186,6 +186,7 @@ public class Main2 {
             if (blocks.size()>cacheBlockCount)//缓存最近cacheBlockCount个区块
                 blocks.remove(0);
             blocks.addLast(block);
+            updateBank(block);
             //添加time
             if (timeRecord.size()==adjustCount)
                 timeRecord.clear();

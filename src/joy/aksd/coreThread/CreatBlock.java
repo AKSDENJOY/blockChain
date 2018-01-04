@@ -153,18 +153,18 @@ public class CreatBlock {
 
     private byte[] getLashHashValue() throws NoSuchAlgorithmException {
         Block block=blocks.getLast();
-        byte[] lashHash=block.getLastHash();
-        byte[] merkle=block.getMerkle();
-        byte[] time=block.getTime();
-        byte difficulty=block.getDifficulty();
-        byte[]nonce=block.getNonce();
-        byte[] tem=new byte[lashHash.length+merkle.length+time.length+1+nonce.length];
-        System.arraycopy(lashHash,0,tem,0,lashHash.length);
-        System.arraycopy(merkle,0,tem,lashHash.length,merkle.length);
-        System.arraycopy(time,0,tem,lashHash.length+merkle.length,time.length);
-        tem[lashHash.length+merkle.length+time.length]=difficulty;
-        System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+time.length+1,nonce.length);
-        byte []result=SHA256x.digest(tem);
+//        byte[] lashHash=block.getLastHash();
+//        byte[] merkle=block.getMerkle();
+//        byte[] time=block.getTime();
+//        byte difficulty=block.getDifficulty();
+//        byte[]nonce=block.getNonce();
+//        byte[] tem=new byte[lashHash.length+merkle.length+time.length+1+nonce.length];
+//        System.arraycopy(lashHash,0,tem,0,lashHash.length);
+//        System.arraycopy(merkle,0,tem,lashHash.length,merkle.length);
+//        System.arraycopy(time,0,tem,lashHash.length+merkle.length,time.length);
+//        tem[lashHash.length+merkle.length+time.length]=difficulty;
+//        System.arraycopy(nonce,0,tem,lashHash.length+merkle.length+time.length+1,nonce.length);
+        byte []result=SHA256x.digest(block.getBlockDatas());
         return result;
     }
 

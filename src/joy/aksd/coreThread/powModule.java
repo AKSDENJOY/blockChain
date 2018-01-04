@@ -50,6 +50,7 @@ public class powModule {
                 blocks.addLast(block);
                 timeRecord.add(byteToInt(time));
                 block.setBlockNumber(num);
+                block.setMinerID(moneyAddress);
                 return;
             }
         }

@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static joy.aksd.data.dataInfo.*;
 import static joy.aksd.data.protocolInfo.*;
+import static joy.aksd.tools.toByte.hexStringToByteArray;
 import static joy.aksd.tools.toByte.intToByte;
 import static joy.aksd.tools.toInt.byteToInt;
 import static joy.aksd.tools.toLong.byteToLong;
@@ -157,6 +158,11 @@ class handleThread implements Runnable {
                 case GETIPLIST:
                     System.out.println("get list");
                     addTofriend(in,out);
+                    break;
+                case GETBANKINFO:
+                    System.out.println("get bank info ");
+                    startDealbankInfo(in,out);
+                    break;
                 default:
                     break;
             }
@@ -173,6 +179,19 @@ class handleThread implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void startDealbankInfo(DataInputStream in, DataOutputStream out) throws IOException {
+        HashMap<String,Integer> temBank=new HashMap<>();
+        synchronized (bank) {
+            temBank.putAll(bank);
+        }
+        out.write(intToByte(temBank.size()));
+        for(String s:temBank.keySet()){
+            out.write(hexStringToByteArray(s));
+            out.write(intToByte(temBank.get(s)));
+        }
+
     }
 
     private void addTofriend(DataInputStream in, DataOutputStream out) throws IOException {
@@ -241,6 +260,7 @@ class handleThread implements Runnable {
                     }
                     try {
                         updatefewData(in);
+                        updateBank(receivedBlock);
                     } catch (Exception e) {
                         System.err.println("error in updatefewdata");
                         ArrayList<Record> tem = new ArrayList<>();
@@ -267,6 +287,8 @@ class handleThread implements Runnable {
             }
         }
     }
+
+
 
     private void updatefewData(DataInputStream in) throws IOException, ClassNotFoundException {
         ObjectInputStream objectInputStream=new ObjectInputStream(in);
@@ -310,6 +332,7 @@ class handleThread implements Runnable {
         ArrayList<Record> temUnPackageRecord= (ArrayList<Record>) objectInputStream.readObject();
         ArrayList<Long> temIndexBlock= (ArrayList<Long>) objectInputStream.readObject();
         ArrayList<Integer> temTimeRecord= (ArrayList<Integer>) objectInputStream.readObject();
+        HashMap<String,Integer> temBank= (HashMap<String, Integer>) objectInputStream.readObject();
 
         System.out.println(receiveblocks.size());
         System.out.println(temVerifyRecord2.toString());
@@ -317,6 +340,7 @@ class handleThread implements Runnable {
         System.out.println(temUnPackageRecord.toString());
         System.out.println(temIndexBlock.size());
         System.out.println(temTimeRecord.size());
+        System.out.println(temBank.size());
 
         blocks.clear();
         blocks.addAll(receiveblocks);
@@ -331,6 +355,7 @@ class handleThread implements Runnable {
         tem.addAll(identifedRecord);
         unPackageRecord.clear();
         identifedRecord=tem;
+        bank=temBank;
         try {
             reWriteToHardrie(receiveblocks);
         }catch (IOException e){

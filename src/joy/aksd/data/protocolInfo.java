@@ -13,6 +13,7 @@ public class protocolInfo {
     public static final byte ADMINQUERY=0x07;//管理员查询
     public static final byte DOWNLOADBLOCK=0x08;//下载区块
     public static final byte GETIPLIST=0x09;//获取IPlist
+    public static final byte GETBANKINFO=0x10;//查询bank所有记录
 
     //下载区块文件时使用
 //    public static final byte HAVEBLOCKFILE=0x10;//区块文件存在

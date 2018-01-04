@@ -1,14 +1,13 @@
 package joy.aksd.data;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.*;
+
+import static joy.aksd.tools.toByte.hexStringToByteArray;
+import static joy.aksd.tools.toInt.byteToInt;
+import static joy.aksd.tools.toString.byteToString;
 
 
 /**
@@ -87,6 +86,14 @@ public class dataInfo {
      * 期待的块号
      */
     public static int num=0;
+    /**
+     * 个人网络资金地址
+     */
+    public static byte[] moneyAddress;
+    /**
+     * 账本缓存，用以保存账户地址里的账目
+     */
+    public static HashMap<String,Integer> bank=new HashMap<>();
 
     public static final String ECNAME="secp160r1";
 
@@ -102,7 +109,28 @@ public class dataInfo {
             setIP();
         } catch (IOException e) {
             System.out.println("IP设置error");
+            System.exit(1);
         }
+        try {
+            setMoneyAddress();
+        } catch (Exception e) {
+            System.out.println("money address set error");
+            System.exit(1);
+        }
+    }
+
+    private static void setMoneyAddress() throws Exception{
+        DataInputStream in=new DataInputStream(new FileInputStream("./privateMoneyFile"));
+        in.readUTF();
+        String second =in.readUTF();
+        String third = in.readUTF();
+        in.close();
+        byte []x=hexStringToByteArray(second);
+        byte []y=hexStringToByteArray(third);
+        byte[] result = new byte[x.length + y.length];
+        System.arraycopy(x, 0, result, 0, x.length);
+        System.arraycopy(y, 0, result, x.length, y.length);
+        moneyAddress=MessageDigest.getInstance("SHA-256").digest(result);
     }
 
     private static void setIP() throws IOException {
@@ -144,6 +172,19 @@ public class dataInfo {
     }
     public static void interuptReset(){
         interupt=false;
+    }
+
+    public static int getReward(int num){
+        return 5;
+    }
+    public static void updateBank(Block block) {
+        String key=byteToString(block.getMinerID());
+        if (bank.containsKey(key)){
+            bank.put(key,bank.get(key)+getReward(byteToInt(block.getBlockNumber())));
+        }
+        else {
+            bank.put(key,getReward(byteToInt(block.getBlockNumber())));
+        }
     }
 
 }

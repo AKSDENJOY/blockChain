@@ -7,6 +7,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.Key;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +16,8 @@ import java.util.concurrent.Executors;
 import static joy.aksd.data.dataInfo.*;
 import static joy.aksd.data.protocolInfo.RECEIVEBLOCK;
 import static joy.aksd.tools.toByte.intToByte;
+import static joy.aksd.tools.toInt.byteToInt;
+import static joy.aksd.tools.toString.byteToString;
 
 /**
  * Created by EnjoyD on 2017/4/20.
@@ -30,6 +33,9 @@ public class BroadcastBlock {
     }
 
     private void broadcast() {
+        //update bank info
+        updateBank(block);
+
         System.out.println("broadcast IPlist size"+IPList.size());
         for(String ip:IPList) {
             if(!ip.equals(localIp))
@@ -97,12 +103,14 @@ class broadCastThread implements Runnable{
                 objectOutputStream.writeObject(unPackageRecord);
                 objectOutputStream.writeObject(indexBlock);
                 objectOutputStream.writeObject(timeRecord);
+                objectOutputStream.writeObject(bank);
 
                 System.out.println(verifyRecord2.toString());
                 System.out.println(identifedRecord.toString());
                 System.out.println(unPackageRecord.toString());
                 System.out.println(indexBlock.size());
                 System.out.println(timeRecord.size());
+                System.out.println(bank.size());
             }
             else if (tag[0] == 0x01){
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);

@@ -137,11 +137,11 @@ public class adminQuery {
     }
 
     private void initName() throws IOException {
-        DataInputStream in=new DataInputStream(new FileInputStream("./adminName"));
+        Scanner in=new Scanner(new FileInputStream("./adminName"));
         while (true){
             try {
-                String lockScript=in.readLine();//windows下可以正常使用，linux下未知
-                String name=in.readLine();
+                String lockScript=in.nextLine();//windows下可以正常使用，linux下未知
+                String name=in.nextLine();
                 if (lockScript==null)
                     break;
                 this.lockSriptToName.put(lockScript,name);

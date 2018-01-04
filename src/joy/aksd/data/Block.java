@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import static joy.aksd.tools.toByte.intToByte;
 import static joy.aksd.tools.toInt.byteToInt;
+import static joy.aksd.tools.toString.byteToString;
 
 /**
  * Created by EnjoyD on 2017/4/18.
@@ -16,10 +17,14 @@ public class Block implements Serializable{
     private byte nonce[];//4 bytes
     private byte cumulativeDifficulty[];//积累难度值，用于区块共识4 bytes
 
+    private byte minerID[];//32 bytes 用于显示谁挖出的区块
+
     private byte data[];
 
     private byte[] blockNumber;//3字节
     private byte[] recordCount;//2字节
+
+
 
 
     public Block(){
@@ -53,14 +58,26 @@ public class Block implements Serializable{
         System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length,tem,0,4);
         setCumulativeDifficulty(tem);
 
+        tem=new byte[32];
+        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length,tem,0,32);
+        setMinerID(tem);
+
         tem=new byte[2];
-        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length,tem,0,2);
+        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+minerID.length,tem,0,2);
         setRecordCount(tem);
 
-        tem=new byte[count.length-(lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length)];
-        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length,tem,0,tem.length);
+        tem=new byte[count.length-(lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+minerID.length+recordCount.length)];
+        System.arraycopy(count,lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+minerID.length+recordCount.length,tem,0,tem.length);
         setData(tem);
 
+    }
+
+    public byte[] getMinerID() {
+        return minerID;
+    }
+
+    public void setMinerID(byte[] minerID) {
+        this.minerID = minerID;
     }
 
     private void setRecordCount(byte[] tem) {
@@ -122,22 +139,12 @@ public class Block implements Serializable{
         this.blockNumber = result;
     }
 
-    /**
-     * 获取头部长度
-     * @return 头部长度
-     */
-    public int getBlockByteNum(){
-        return 32+32+4+4+1+4;
+    public byte[] getCumulativeDifficulty() {
+        return cumulativeDifficulty;
     }
 
-    @Override
-    public String toString() {
-        return "num:"+byteToInt(blockNumber)+"\n"+
-                "nonce:"+byteToInt(nonce)+"\n"+
-                "diff:"+(difficulty&0xff)+"\n"+
-                "time:"+byteToInt(time)+"\n"+
-                "cumulativeDifficulty:"+byteToInt(cumulativeDifficulty)+"\n";
-
+    public void setCumulativeDifficulty(byte [] cumulativeDifficulty) {
+        this.cumulativeDifficulty = cumulativeDifficulty;
     }
 
     public byte[] getData() {
@@ -160,11 +167,32 @@ public class Block implements Serializable{
     }
 
     /**
+     * 获取头部长度
+     * @return 头部长度
+     * lastHash+Merkle+time+nonce+diffculty+cumulativeDiff+MinerID
+     */
+    public int getBlockByteNum(){
+        return 32+32+4+4+1+4+32;
+    }
+
+    @Override
+    public String toString() {
+        return "num:"+byteToInt(blockNumber)+"\n"+
+                "nonce:"+byteToInt(nonce)+"\n"+
+                "diff:"+(difficulty&0xff)+"\n"+
+                "time:"+byteToInt(time)+"\n"+
+                "cumulativeDifficulty:"+byteToInt(cumulativeDifficulty)+"\n"+
+                "MinerID:"+byteToString(minerID)+"\n";
+
+    }
+
+
+    /**
      * 获取整个block 字节数组
      * @return  block字节数组 读取时先读取前两字节得到整个区块长度，然后再读取剩余字节用构造函数生成区块
      */
     public byte[] getBlockDatas(){
-        int i=lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length+data.length;
+        int i=lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+minerID.length+recordCount.length+data.length;
         byte result[]=new byte[2+i];
         byte tem[]=intToByte(i);
         System.arraycopy(tem,2,result,0,2);
@@ -175,16 +203,11 @@ public class Block implements Serializable{
         System.arraycopy(nonce,0,result,2+lastHash.length+Merkle.length+time.length+1,nonce.length);
         System.arraycopy(blockNumber,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length,blockNumber.length);
         System.arraycopy(cumulativeDifficulty,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length,cumulativeDifficulty.length);
-        System.arraycopy(recordCount,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length,recordCount.length);
-        System.arraycopy(data,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+recordCount.length,data.length);
+        System.arraycopy(minerID,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length,minerID.length);
+        System.arraycopy(recordCount,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+minerID.length,recordCount.length);
+        System.arraycopy(data,0,result,2+lastHash.length+Merkle.length+time.length+1+nonce.length+blockNumber.length+cumulativeDifficulty.length+minerID.length+recordCount.length,data.length);
         return result;
     }
 
-    public byte[] getCumulativeDifficulty() {
-        return cumulativeDifficulty;
-    }
 
-    public void setCumulativeDifficulty(byte [] cumulativeDifficulty) {
-        this.cumulativeDifficulty = cumulativeDifficulty;
-    }
 }
