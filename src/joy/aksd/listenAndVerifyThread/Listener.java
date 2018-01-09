@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.*;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPoint;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -166,6 +167,11 @@ class handleThread implements Runnable {
                 case SELF_MONEY_QUERY:
                     System.out.println("self money info query");
                     dealSelfMoneyQuery(in,out);
+                    break;
+                case CONSUMEMONEY:
+                    System.out.println("self consuming");
+                    dealSelfConsume(in,out);
+                    break;
                 default:
                     break;
             }
@@ -182,6 +188,43 @@ class handleThread implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void dealSelfConsume(DataInputStream in, DataOutputStream out) throws Exception {
+        byte []lengthOfArray=new byte[4];
+        in.read(lengthOfArray);
+        int length=byteToInt(lengthOfArray);
+        byte []consumeMoney=new byte[4];
+        in.read(consumeMoney);
+        byte []publicKeyXOfArray=new byte[32];
+        in.read(publicKeyXOfArray);
+        byte []publicKeyYOfArray=new byte[32];
+        in.read(publicKeyYOfArray);
+        byte[]signature=new byte[length-4-32-32];
+        in.read(signature);
+        if (isRightSignature(consumeMoney,publicKeyXOfArray,publicKeyYOfArray,signature)){
+            System.out.println("verify right");
+            String personalBankAddr=getBankAddr(publicKeyXOfArray,publicKeyYOfArray);
+            updateBank(personalBankAddr,consumeMoney);
+            //broadcast to other
+        }
+
+
+    }
+
+    private String getBankAddr(byte[] publicKeyXOfArray, byte[] publicKeyYOfArray) throws NoSuchAlgorithmException {
+        byte []tem=new byte[publicKeyXOfArray.length+publicKeyYOfArray.length];
+        System.arraycopy(publicKeyXOfArray,0,tem,0,publicKeyXOfArray.length);
+        System.arraycopy(publicKeyYOfArray,0,tem,publicKeyXOfArray.length,publicKeyYOfArray.length);
+        return byteToString(MessageDigest.getInstance("SHA-256").digest(tem));
+    }
+
+    private boolean isRightSignature(byte[] consumeMoney, byte[] publicKeyXOfByteArray, byte[] publicKeyYOfByteArray, byte[] signature) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature s=Signature.getInstance("SHA1withECDSA","SunEC");
+        ECPublicKey publicKey=new ECPublicKeyImpl(new ECPoint(new BigInteger(1,publicKeyXOfByteArray),new BigInteger(1,publicKeyYOfByteArray)),ECC.spec);
+        s.initVerify(publicKey);
+        s.update(consumeMoney);
+        return s.verify(signature);
     }
 
     private void dealSelfMoneyQuery(DataInputStream in, DataOutputStream out) throws IOException {

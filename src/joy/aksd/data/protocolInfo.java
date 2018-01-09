@@ -15,6 +15,7 @@ public class protocolInfo {
     public static final byte GETIPLIST=0x09;//获取IPlist
     public static final byte GETBANKINFO=0x0a;//admin查询bank所有记录
     public static final byte SELF_MONEY_QUERY=0x0b;//self查询个人代币
+    public static final byte CONSUMEMONEY=0x0c;//self消费个人代币
 
 
     public static final byte LINKTEST =0x0f;//连接测试

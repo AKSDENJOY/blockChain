@@ -187,4 +187,10 @@ public class dataInfo {
         }
     }
 
+    public static void updateBank(String personalBankAddr, byte[] consumeMoney) {
+        if (bank.containsKey(personalBankAddr)){
+            bank.put(personalBankAddr,bank.get(personalBankAddr)-byteToInt(consumeMoney));
+        }
+    }
+
 }

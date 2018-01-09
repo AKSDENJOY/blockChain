@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.*;
 
-import static joy.aksd.data.dataInfo.ECNAME;
+//import static joy.aksd.data.dataInfo.ECNAME;
 import static joy.aksd.tools.toByte.hexStringToByteArray;
 
 /**
@@ -37,7 +37,7 @@ public class ECC {
         KeyPairGenerator kpg;
         kpg=KeyPairGenerator.getInstance("EC","SunEC");
         ECGenParameterSpec ecsp;
-        ecsp=new ECGenParameterSpec(ECNAME);
+        ecsp=new ECGenParameterSpec("secp160r1");
         kpg.initialize(ecsp);
 
         KeyPair keyPair=kpg.generateKeyPair();
@@ -56,6 +56,7 @@ public class ECC {
 
         BigInteger bigInteger=new BigInteger(tems,16);
         BigInteger bigInteger1=new BigInteger(1,hexStringToByteArray(tems));
+        ecPrivateKey=new ECPrivateKeyImpl(bigInteger1,ECC.spec);
 
         System.out.println(bigInteger);
         System.out.println(bigInteger1);
@@ -66,7 +67,7 @@ public class ECC {
         //签名
         String s="my name is wy";
         Signature e=Signature.getInstance("SHA1withECDSA","SunEC");
-        e.initSign(priKey);
+        e.initSign(ecPrivateKey);
         byte[] ss=s.getBytes(StandardCharsets.UTF_8);
         e.update(ss);
         byte []result=e.sign();

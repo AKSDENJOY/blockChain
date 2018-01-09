@@ -14,26 +14,34 @@ import static joy.aksd.tools.toInt.byteToInt;
  * Created by EnjoyD on 2018/1/9.
  */
 public class QuerySelfMoney {
-    public static void main(String[] args) {
-        Socket socket;
+    public static int process() {
+//        Socket socket=null;
         byte[]receive;
-        try {
-            socket = new Socket(ROOTIP,PORT);
+        try (Socket socket=new Socket(ROOTIP,PORT)){
             socket.getOutputStream().write(SELF_MONEY_QUERY);
             socket.getOutputStream().write(moneyAddress);
-            receive=new byte[4];
+            receive=new byte[4];//用来获取一个int数字
             socket.getInputStream().read(receive);
             socket.close();
         } catch (IOException e) {
             System.out.println("error in network please check the net connection");
-            return;
+            System.exit(1);
+            return -1;
         }
         System.out.println("finish query");
         int money=byteToInt(receive);
-        if (money<0){
+        if (money<0)
             System.out.println("your account is not exist");
-        }
+
         else
             System.out.println("your account money is "+money);
+        return money;
     }
+
+    public static void main(String[] args) {
+        process();
+    }
+
+
+
 }
