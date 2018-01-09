@@ -163,6 +163,9 @@ class handleThread implements Runnable {
                     System.out.println("get bank info ");
                     startDealbankInfo(in,out);
                     break;
+                case SELF_MONEY_QUERY:
+                    System.out.println("self money info query");
+                    dealSelfMoneyQuery(in,out);
                 default:
                     break;
             }
@@ -178,6 +181,18 @@ class handleThread implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void dealSelfMoneyQuery(DataInputStream in, DataOutputStream out) throws IOException {
+        byte buff[]=new byte[32];
+        in.read(buff);
+        String userAddr=byteToString(buff);
+        if (bank.containsKey(userAddr)){
+            out.write(intToByte(bank.get(userAddr)));
+        }
+        else {
+            out.write(intToByte(-1));
         }
     }
 
