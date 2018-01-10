@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 
 import static joy.aksd.data.dataInfo.*;
+import static joy.aksd.data.protocolInfo.QUERYORDERSTAMPANDTIME;
 import static joy.aksd.data.protocolInfo.RECIVERECORD;
 import static joy.aksd.tools.toByte.hexStringToByteArray;
 import static joy.aksd.tools.toByte.intToByte;
@@ -131,7 +132,7 @@ public class CreatRecord {
         Socket socket=new Socket(ROOTIP,PORT);
         OutputStream out=socket.getOutputStream();
         InputStream in=socket.getInputStream();
-        out.write(0x03);
+        out.write(QUERYORDERSTAMPANDTIME);
         out.write(lockScrpit);
         byte orderStamp[] = new byte[4];
         in.read(orderStamp);

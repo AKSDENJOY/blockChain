@@ -75,8 +75,6 @@ class handleThread implements Runnable {
             byte tag = in.readByte();
             Record record ;
             byte[] receive ;
-            int i;
-            byte tem[];
             switch (tag) {
                 case REGISTER://新用户注册进区块链
                     //admin
@@ -103,45 +101,26 @@ class handleThread implements Runnable {
                     receive=new byte[byteToInt(receive)];
                     in.read(receive);
                     record = new Record(receive);
-//                    record = new Record();
-//                    receive = new byte[6];
-//                    in.read(receive);
-//                    record.setMac(receive);
-//                    receive=new byte[4];
-//                    in.read(receive);
-//                    record.setOrderStamp(receive);
-//                    receive=new byte[4];
-//                    in.read(receive);
-//                    record.setTime(receive);
-//                    receive=new byte[32];
-//                    in.read(receive);
-//                    record.setLockScript(receive);
-//                    receive=new byte[100];
-//                    i=in.read(receive);
-//                    tem=new byte[i];
-//                    System.arraycopy(receive,0,tem,0,i);
-//                    record.setUnLockScript(tem);
                     if (ttl!=0)
                         dealRecord(record,ttl);
                     this.socket.close();
-//                in.read(receive);
                     break;
-                case 0x02:
+                case 0x02://前期测试用
                     System.out.println("send result");
                     sendResult(out);
                     this.socket.close();
                     break;
-                case 0x03://查询顺序戳
+                case QUERYORDERSTAMPANDTIME://查询顺序戳
                     System.out.println("orderstamp and time");
                     sendOrderStampAndTime(in,out);
                     this.socket.close();
                     break;
-                case 0x0f://测试链接
+                case LINKTEST://测试链接
                     System.out.println("test link");
                     break;
                 case SELFQUERY://查询个人记录
                     System.out.println("query self informaiton");
-                    startSearchIndividual(in,out);
+                    startSearchIndividualRecord(in,out);
                     this.socket.close();
                     break;
                 case RECEIVEBLOCK:
@@ -150,28 +129,27 @@ class handleThread implements Runnable {
                     break;
                 case ADMINQUERY:
                     System.out.println("admin query");
-                    startAdminQuery(in,out);
+                    startAdminQueryProcess(in,out);
                     break;
                 case DOWNLOADBLOCK:
                     System.out.println("receive down request");
-
-                    startTransfer(in,out);
+                    startDownloadBlockProcess(in,out);
                     break;
                 case GETIPLIST:
                     System.out.println("get list");
-                    addTofriend(in,out);
+                    startGetIpListPorcess(in,out);
                     break;
                 case GETBANKINFO:
                     System.out.println("get bank info ");
-                    startDealbankInfo(in,out);
+                    startDealbankInfoProcess(in,out);
                     break;
                 case SELF_MONEY_QUERY:
                     System.out.println("self money info query");
-                    dealSelfMoneyQuery(in,out);
+                    startSelfMoneyQueryProcess(in,out);
                     break;
                 case CONSUMEMONEY:
                     System.out.println("self consuming");
-                    dealSelfConsume(in,out);
+                    startSelfConsumeProcess(in,out);
                     break;
                 default:
                     break;
@@ -191,7 +169,7 @@ class handleThread implements Runnable {
         }
     }
 
-    private void dealSelfConsume(DataInputStream in, DataOutputStream out) throws Exception {
+    private void startSelfConsumeProcess(DataInputStream in, DataOutputStream out) throws Exception {
         byte []lengthOfArray=new byte[4];
         in.read(lengthOfArray);
         int length=byteToInt(lengthOfArray);
@@ -259,7 +237,7 @@ class handleThread implements Runnable {
         return s.verify(signature);
     }
 
-    private void dealSelfMoneyQuery(DataInputStream in, DataOutputStream out) throws IOException {
+    private void startSelfMoneyQueryProcess(DataInputStream in, DataOutputStream out) throws IOException {
         byte buff[]=new byte[32];
         in.read(buff);
         String userAddr=byteToString(buff);
@@ -271,7 +249,7 @@ class handleThread implements Runnable {
         }
     }
 
-    private void startDealbankInfo(DataInputStream in, DataOutputStream out) throws IOException {
+    private void startDealbankInfoProcess(DataInputStream in, DataOutputStream out) throws IOException {
         HashMap<String,Integer> temBank=new HashMap<>();
         synchronized (bank) {
             temBank.putAll(bank);
@@ -284,7 +262,7 @@ class handleThread implements Runnable {
 
     }
 
-    private void addTofriend(DataInputStream in, DataOutputStream out) throws IOException {
+    private void startGetIpListPorcess(DataInputStream in, DataOutputStream out) throws IOException {
 
         String ip=this.socket.getRemoteSocketAddress().toString().split(":")[0];
         ip=ip.substring(1);
@@ -377,7 +355,6 @@ class handleThread implements Runnable {
             }
         }
     }
-
 
 
     private void updatefewData(DataInputStream in) throws IOException, ClassNotFoundException {
@@ -528,7 +505,7 @@ class handleThread implements Runnable {
         }
     }
 
-    private void startTransfer(DataInputStream in, DataOutputStream out) throws IOException {
+    private void startDownloadBlockProcess(DataInputStream in, DataOutputStream out) throws IOException {
         RandomAccessFile file=null;
         try {
             byte []lens=new byte[8];
@@ -546,7 +523,7 @@ class handleThread implements Runnable {
         }
     }
 
-    private void startAdminQuery(DataInputStream in, DataOutputStream out) throws IOException{
+    private void startAdminQueryProcess(DataInputStream in, DataOutputStream out) throws IOException{
         ArrayList<Record> recordToBeSent=new ArrayList<>();
         synchronized (identifedRecord){//从后向前遍历保证顺序
             int size=identifedRecord.size();
@@ -604,7 +581,7 @@ class handleThread implements Runnable {
 
     }
 
-    private void startSearchIndividual(DataInputStream in, DataOutputStream out) throws IOException {
+    private void startSearchIndividualRecord(DataInputStream in, DataOutputStream out) throws IOException {
         byte lockScrpit[]=new byte[32];
         in.read(lockScrpit);
         int count=10;//默认查询10条记录
