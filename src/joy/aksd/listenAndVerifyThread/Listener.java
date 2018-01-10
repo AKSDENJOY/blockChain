@@ -2,6 +2,7 @@ package joy.aksd.listenAndVerifyThread;
 
 import joy.aksd.ECC.ECC;
 import joy.aksd.coreThread.BroadcastBlock;
+import joy.aksd.coreThread.BroadcastCusumeMessage;
 import joy.aksd.coreThread.BroadcastRecord;
 import joy.aksd.coreThread.WriteBlock;
 import joy.aksd.data.Block;
@@ -196,20 +197,51 @@ class handleThread implements Runnable {
         int length=byteToInt(lengthOfArray);
         byte []consumeMoney=new byte[4];
         in.read(consumeMoney);
-        byte []publicKeyXOfArray=new byte[32];
+        byte []publicKeyXOfArray=new byte[20];
         in.read(publicKeyXOfArray);
-        byte []publicKeyYOfArray=new byte[32];
+        byte []publicKeyYOfArray=new byte[20];
         in.read(publicKeyYOfArray);
-        byte[]signature=new byte[length-4-32-32];
+        byte[]signature=new byte[length-4-20-20];
         in.read(signature);
+        byte[]messageToBeSent=getMessageToBeSent(consumeMoney,publicKeyXOfArray,publicKeyYOfArray,signature);
+        if (messageHasReceived(messageToBeSent)){
+            System.out.println("recently receive the message");
+            return;
+        }
+
         if (isRightSignature(consumeMoney,publicKeyXOfArray,publicKeyYOfArray,signature)){
             System.out.println("verify right");
             String personalBankAddr=getBankAddr(publicKeyXOfArray,publicKeyYOfArray);
             updateBank(personalBankAddr,consumeMoney);
+            updateCacheMessage(messageToBeSent);
             //broadcast to other
+            new BroadcastCusumeMessage(messageToBeSent).start();
         }
 
+    }
 
+    private void updateCacheMessage(byte[] messageToBeSent) throws NoSuchAlgorithmException {
+        byte[]SHA256Result=MessageDigest.getInstance("SHA-256").digest(messageToBeSent);
+        cacheMessage.put(byteToString(SHA256Result),10);
+    }
+
+    private byte[] getMessageToBeSent(byte[] consumeMoney, byte[] publicKeyXOfArray, byte[] publicKeyYOfArray, byte[] signature) {
+        byte []messageToBeSent=new byte[consumeMoney.length+publicKeyXOfArray.length+publicKeyYOfArray.length+signature.length];
+        System.arraycopy(consumeMoney,0,messageToBeSent,0,consumeMoney.length);
+        System.arraycopy(publicKeyXOfArray,0,messageToBeSent,consumeMoney.length,publicKeyXOfArray.length);
+        System.arraycopy(publicKeyYOfArray,0,messageToBeSent,consumeMoney.length+publicKeyXOfArray.length,publicKeyYOfArray.length);
+        System.arraycopy(signature,0,messageToBeSent,consumeMoney.length+publicKeyXOfArray.length+publicKeyYOfArray.length,signature.length);
+        return messageToBeSent;
+    }
+
+    private boolean messageHasReceived(byte[] messageToBeSent) throws NoSuchAlgorithmException {
+        byte[]SHA256Result=MessageDigest.getInstance("SHA-256").digest(messageToBeSent);
+        if (cacheMessage.containsKey(byteToString(SHA256Result))){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     private String getBankAddr(byte[] publicKeyXOfArray, byte[] publicKeyYOfArray) throws NoSuchAlgorithmException {

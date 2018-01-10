@@ -94,6 +94,10 @@ public class dataInfo {
      * 账本缓存，用以保存账户地址里的账目
      */
     public static HashMap<String,Integer> bank=new HashMap<>();
+    /**
+     * 用来进行缓存最近收到的消费信息，防止多次消费
+     */
+    public static HashMap<String,Integer> cacheMessage=new HashMap<>();
 
     public static final String ECNAME="secp160r1";
 
